@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listables - Order Confirmed</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#DB4444',
+                        secondary: '#F5F5F5',
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="font-sans antialiased text-gray-900 bg-white min-h-screen flex flex-col">
+
+    <!-- Global Top Header -->
+    <header class="border-b border-gray-200 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-[88px]">
+                <div class="flex-shrink-0">
+                    <a href="index.html" class="text-2xl font-bold tracking-tight text-black">Listables</a>
+                </div>
+
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-gray-900 text-[15px] font-medium hover:text-black">Home</a>
+                    <a href="#" class="text-gray-900 text-[15px] font-medium hover:text-black">Contact</a>
+                    <a href="#" class="text-gray-900 text-[15px] font-medium hover:text-black">About</a>
+                    <a href="#" class="text-gray-900 text-[15px] font-medium hover:text-black">Sign Up</a>
+                </nav>
+
+                <div class="flex items-center space-x-6">
+                    <div class="relative hidden sm:block">
+                        <input type="text" placeholder="What are you looking for?"
+                            class="bg-[#F5F5F5] rounded text-sm px-4 py-2 w-[240px] focus:outline-none focus:ring-1 pr-10">
+                        <button class="absolute right-3 top-2.5 text-black">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center justify-center w-full px-4 py-32 bg-white">
+        <h1 class="text-[32px] font-semibold mb-4 text-black tracking-tight">Order Confirmed</h1>
+        <p class="text-[15px] text-black font-light mb-12">Thank you for your purchase. Your order number is #12345.</p>
+
+        <div class="flex items-center space-x-6">
+            <a href="orders.html"
+                class="border border-gray-400 text-black px-12 py-3.5 hover:bg-gray-50 transition duration-300 text-[15px] font-medium rounded-sm">
+                View Orders
+            </a>
+            <a href="index.html"
+                class="bg-[#DB4444] text-white px-12 py-3.5 hover:bg-[#c33333] transition duration-300 text-[15px] font-medium rounded-sm">
+                Continue Shopping
+            </a>
+        </div>
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="bg-black text-white pt-20 pb-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-16">
+                <!-- Column 1: Subscribe -->
+                <div class="space-y-4">
+                    <h3 class="text-xl font-bold mb-6">Exclusive</h3>
+                    <h4 class="text-lg font-medium">Subscribe</h4>
+                    <p class="text-[15px] font-light text-gray-200">Get 10% off your first order</p>
+                    <div class="relative mt-2">
+                        <input type="email" placeholder="Enter your email"
+                            class="bg-transparent border-1.5 border-white rounded px-4 py-3 w-full text-sm placeholder-gray-400 focus:outline-none">
+                        <button class="absolute right-4 top-3.5 text-white">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <!-- Column 2: Support -->
+                <div class="space-y-4">
+                    <h3 class="text-xl font-medium mb-6">Support</h3>
+                    <div class="space-y-4 text-[15px] font-light text-gray-200">
+                        <p>listables@gmail.com</p>
+                    </div>
+                </div>
+                <!-- Column 3: Account -->
+                <div class="space-y-4">
+                    <h3 class="text-xl font-medium mb-6">Account</h3>
+                    <ul class="space-y-4 text-[15px] font-light text-gray-200">
+                        <li><a href="#" class="hover:text-white transition">My Account</a></li>
+                        <li><a href="#" class="hover:text-white transition">Sign up as a seller</a></li>
+                        <li><a href="#" class="hover:text-white transition">Wishlist</a></li>
+                    </ul>
+                </div>
+                <!-- Column 4: Quick Link -->
+                <div class="space-y-4">
+                    <h3 class="text-xl font-medium mb-6">Quick Link</h3>
+                    <ul class="space-y-4 text-[15px] font-light text-gray-200">
+                        <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition">Terms Of Use</a></li>
+                        <li><a href="#" class="hover:text-white transition">FAQ</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact</a></li>
+                    </ul>
+                </div>
+                <!-- Column 5: App Download -->
+                <div class="space-y-4">
+                    <h3 class="text-xl font-medium mb-6">Download App</h3>
+                    <p class="text-xs font-light text-gray-400">Save EGP 300 with App New User Only</p>
+                    <div class="flex items-center space-x-3 mt-2">
+                        <div class="w-[80px] h-[80px] bg-white p-1 rounded-sm">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=listables"
+                                alt="QR Code" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <a href="#" class="w-[104px]"><img
+                                    src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                                    alt="Google Play"></a>
+                            <a href="#" class="w-[104px]"><img
+                                    src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg"
+                                    alt="App Store"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-[#141414] pt-6 flex justify-center text-[15px] text-[#3D3D3D]">
+                <p>&copy; Copyright Listables 2025. All right reserved</p>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

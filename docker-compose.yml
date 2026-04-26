@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: listables
+      POSTGRES_USER: listables
+      POSTGRES_PASSWORD: listables
+    ports:
+      - "5432:5432"
+    volumes:
+      - listables_db:/var/lib/postgresql/data
+
+volumes:
+  listables_db:
+
