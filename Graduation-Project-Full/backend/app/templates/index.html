@@ -1,0 +1,191 @@
+{% extends "_layout.html" %}
+{% block content %}
+<main class="flex-grow w-full pb-20">
+
+    <!-- Hero Section -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Sidebar -->
+            <div class="w-full md:w-1/4 border-r border-gray-200 pr-4 hidden md:block">
+                <ul class="text-[15px] space-y-4">
+                    <li class="cursor-pointer hover:font-medium"><a href="/category/Fashion">Woman's Fashion</a></li>
+                    <li class="cursor-pointer hover:font-medium"><a href="/category/Fashion">Men's Fashion</a></li>
+                    <li class="cursor-pointer hover:font-medium"><a href="/category/Electronics">Electronics</a></li>
+                    <li class="cursor-pointer hover:font-medium"><a href="/category/Home">Home & Lifestyle</a></li>
+                    <li class="cursor-pointer hover:font-medium"><a href="/category/Medicine">Medicine</a></li>
+                    <li class="cursor-pointer hover:font-medium"><a href="/category/Sports">Sports & Outdoor</a></li>
+                    <li class="cursor-pointer hover:font-medium"><a href="/category/Baby">Baby's & Toys</a></li>
+                    <li class="cursor-pointer hover:font-medium"><a href="/category/Groceries">Groceries & Pets</a></li>
+                    <li class="cursor-pointer hover:font-medium"><a href="/category/Health">Health & Beauty</a></li>
+                </ul>
+            </div>
+
+            <!-- Banner -->
+            <div class="w-full md:w-3/4">
+                <div class="bg-black text-white min-h-[344px] rounded relative overflow-hidden flex items-center p-12 justify-between">
+                    <div class="z-10 w-1/2">
+                        <p class="text-sm mb-4">iPhone 17 Series</p>
+                        <h2 class="text-4xl font-bold leading-tight mb-6">Up to 10% off Voucher</h2>
+                        <a href="/category/Electronics" class="inline-flex items-center space-x-2 border-b border-gray-400 pb-1 hover:text-gray-300 transition">
+                            <span>Shop Now</span>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                            </svg>
+                        </a>
+                    </div>
+                    <div class="absolute right-0 top-0 h-full w-1/2 flex items-center justify-center">
+                        <img src="https://images.unsplash.com/photo-1616348436168-de43ad0db179?auto=format&fit=crop&q=80&h=300" alt="iPhone" class="max-h-[90%] object-contain">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section: Featured Products from DB -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+        <div class="flex items-center space-x-4 text-primary font-semibold mb-6">
+            <span class="w-5 h-10 bg-primary rounded-sm"></span>
+            <span>Today's</span>
+        </div>
+        <div class="flex items-end justify-between mb-8">
+            <h2 class="text-3xl font-bold tracking-tight">Featured Products</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for product in products %}
+            <div class="group relative">
+                <div class="bg-secondary rounded relative flex flex-col items-center justify-center p-6 h-64 mb-4 overflow-hidden">
+                    <div class="absolute top-3 left-3">
+                    </div>
+                    <div class="absolute top-3 right-3 flex flex-col space-y-2">
+                        <form method="post" action="/wishlist/add">
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <button type="submit" class="bg-white rounded-full p-1.5 shadow-sm hover:bg-gray-100" title="Add to wishlist">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                            </button>
+                        </form>
+                        <a href="/product-details.html?slug={{ product.slug }}" class="bg-white rounded-full p-1.5 shadow-sm hover:bg-gray-100 block">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                        </a>
+                    </div>
+                    <img src="{{ product.image_url }}" alt="{{ product.name }}" class="max-h-full object-contain mix-blend-multiply drop-shadow">
+                    <!-- Add to cart overlay -->
+                    <div class="absolute bottom-0 left-0 right-0 bg-black text-white text-center py-2 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                        <form method="post" action="/cart/add">
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <input type="hidden" name="qty" value="1">
+                            <button type="submit" class="w-full">Add To Cart</button>
+                        </form>
+                    </div>
+                </div>
+                <a href="/product-details.html?slug={{ product.slug }}">
+                    <h3 class="text-sm font-medium text-black hover:underline">{{ product.name }}</h3>
+                </a>
+                <div class="flex items-center space-x-3 mt-1 text-sm">
+                    <span class="text-primary font-medium">{{ money_fmt(product.currency, product.price_minor) }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-10 mb-20 border-b border-gray-200 pb-16">
+            <a href="/search.html" class="inline-block bg-primary text-white rounded px-10 py-3 text-sm font-medium hover:bg-red-600 transition">View All Products</a>
+        </div>
+    </div>
+
+    <!-- Section: Categories -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20 border-b border-gray-200 pb-16">
+        <div class="flex items-center space-x-4 text-primary font-semibold mb-6">
+            <span class="w-5 h-10 bg-primary rounded-sm"></span>
+            <span>Categories</span>
+        </div>
+        <div class="flex items-end justify-between mb-8">
+            <h2 class="text-3xl font-bold tracking-tight">Browse By Category</h2>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
+            <a href="/category/Phones" class="flex flex-col items-center justify-center border border-gray-300 rounded h-36 hover:bg-primary hover:text-white hover:border-primary transition">
+                <svg class="w-10 h-10 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+                <span class="text-sm">Phones</span>
+            </a>
+            <a href="/category/Computers" class="flex flex-col items-center justify-center border border-gray-300 rounded h-36 hover:bg-primary hover:text-white hover:border-primary transition">
+                <svg class="w-10 h-10 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+                <span class="text-sm">Computers</span>
+            </a>
+            <a href="/category/SmartWatch" class="flex flex-col items-center justify-center border border-gray-300 rounded h-36 hover:bg-primary hover:text-white hover:border-primary transition">
+                <svg class="w-10 h-10 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-sm">SmartWatch</span>
+            </a>
+            <a href="/category/Camera" class="flex flex-col items-center justify-center border border-gray-300 rounded h-36 hover:bg-primary hover:text-white hover:border-primary transition">
+                <svg class="w-10 h-10 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path d="M3 9a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                    <path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span class="text-sm">Camera</span>
+            </a>
+            <a href="/category/HeadPhones" class="flex flex-col items-center justify-center border border-gray-300 rounded h-36 hover:bg-primary hover:text-white hover:border-primary transition">
+                <svg class="w-10 h-10 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path d="M10 21h4v-3H10v3zm2-18A8.005 8.005 0 004 11v8h2v-6h12v6h2v-8c0-4.418-3.582-8-8-8z"></path>
+                </svg>
+                <span class="text-sm">HeadPhones</span>
+            </a>
+            <a href="/category/Gaming" class="flex flex-col items-center justify-center border border-gray-300 rounded h-36 hover:bg-primary hover:text-white hover:border-primary transition">
+                <svg class="w-10 h-10 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path d="M11 6h2M9 10h6m-3-4v8m-5-8A2 2 0 002 6v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2H4z"></path>
+                </svg>
+                <span class="text-sm">Gaming</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-24 mb-10 pt-10">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center px-4 md:px-20">
+            <div class="flex flex-col items-center">
+                <div class="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center mb-6 border-8 border-gray-200">
+                    <div class="w-14 h-14 rounded-full bg-black flex items-center justify-center text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-lg font-bold mb-2 uppercase">Free and Fast Delivery</h3>
+                <p class="text-sm text-gray-600">Free delivery for all orders over EGP 1400</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center mb-6 border-8 border-gray-200">
+                    <div class="w-14 h-14 rounded-full bg-black flex items-center justify-center text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-lg font-bold mb-2 uppercase">24/7 Customer Service</h3>
+                <p class="text-sm text-gray-600">Friendly 24/7 customer support</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center mb-6 border-8 border-gray-200">
+                    <div class="w-14 h-14 rounded-full bg-black flex items-center justify-center text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-lg font-bold mb-2 uppercase">Money Back Guarantee</h3>
+                <p class="text-sm text-gray-600">We return money within 30 days</p>
+            </div>
+        </div>
+    </div>
+
+</main>
+{% endblock %}

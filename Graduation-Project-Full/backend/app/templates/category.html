@@ -1,0 +1,127 @@
+{% extends "_layout.html" %}
+{% block content %}
+<main class="flex-grow w-full pb-20 pt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Header -->
+    <div class="flex items-end justify-between mb-6">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Browse</p>
+        <h1 class="text-3xl font-bold tracking-tight">{{ category_name }}</h1>
+        {% if q or filter_type %}
+          <p class="text-sm text-gray-500 mt-1">
+            {% if q %}Results for "{{ q }}"{% endif %}
+            {% if q and filter_type %} · {% endif %}
+            {% if filter_type %}Filtered by "{{ filter_type }}"{% endif %}
+          </p>
+        {% endif %}
+      </div>
+      <a href="/index.html"
+        class="inline-block border border-gray-400 text-black rounded px-6 py-3 text-sm font-medium hover:bg-gray-50 transition">
+        Back
+      </a>
+    </div>
+
+    <!-- Search + Filter bar -->
+    <form method="get" action="/category/{{ category_name }}"
+      class="flex flex-col sm:flex-row gap-3 mb-10">
+
+      <div class="relative flex-1">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+          fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z"/>
+        </svg>
+        <input
+          type="text"
+          name="q"
+          value="{{ q or '' }}"
+          placeholder="Search in {{ category_name }}…"
+          class="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+      </div>
+
+      {% if filter_options %}
+      <div class="relative">
+        <select name="filter_type"
+          class="appearance-none pl-4 pr-10 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer min-w-[160px]">
+          <option value="">All types</option>
+          {% for opt in filter_options %}
+            <option value="{{ opt }}" {% if filter_type == opt %}selected{% endif %}>{{ opt }}</option>
+          {% endfor %}
+        </select>
+        <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+          fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </div>
+      {% endif %}
+
+      <button type="submit"
+        class="px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-red-600 transition whitespace-nowrap">
+        Search
+      </button>
+
+      {% if q or filter_type %}
+      <a href="/category/{{ category_name }}"
+        class="px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-500 hover:bg-gray-50 transition whitespace-nowrap inline-flex items-center">
+        Clear
+      </a>
+      {% endif %}
+    </form>
+
+    <!-- Product grid -->
+    {% if products %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {% for p in products %}
+      <div class="group relative">
+        <div class="bg-secondary rounded relative flex flex-col items-center justify-center p-6 h-64 mb-4 border border-gray-100 hover:border-gray-200 transition">
+          <a class="absolute inset-0" href="/product-details.html?slug={{ p.slug }}" aria-label="View {{ p.name }}"></a>
+          <img src="{{ p.image_url }}" alt="{{ p.name }}"
+            class="max-h-full object-contain mix-blend-multiply drop-shadow">
+        </div>
+        <h3 class="text-sm font-medium text-black truncate">{{ p.name }}</h3>
+        {% if filter_type and "— Additional details —" in p.description %}
+          {% set detail_part = p.description.split("— Additional details —")[1] %}
+          {% for line in detail_part.split("\n") %}
+            {% if ":" in line %}
+              {% set kv = line.split(":", 1) %}
+              {% if kv[0].strip() | lower in ["brand", "platform", "genre", "condition", "material", "sport"] %}
+                <p class="text-xs text-gray-400 mt-0.5 truncate">{{ kv[0].strip() }}: {{ kv[1].strip() }}</p>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+        <div class="flex items-center justify-between mt-2 text-sm">
+          <span class="text-primary font-medium">{{ money_fmt(p.currency, p.price_minor) }}</span>
+          <form method="post" action="/cart/add" class="relative z-10">
+            <input type="hidden" name="product_id" value="{{ p.id }}">
+            <input type="hidden" name="qty" value="1">
+            <button type="submit"
+              class="bg-black text-white text-xs px-3 py-2 rounded hover:bg-gray-800 transition">Add</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <p class="text-xs text-gray-400 mt-8 text-center">
+      {{ products | length }} product{{ 's' if products | length != 1 else '' }} found
+    </p>
+
+    {% else %}
+    <div class="mt-10 bg-secondary border border-gray-200 rounded px-6 py-14 text-center">
+      <p class="text-[15px] text-gray-500">No products found in <strong>{{ category_name }}</strong>
+        {% if q %} matching "{{ q }}"{% endif %}
+        {% if filter_type %} with type "{{ filter_type }}"{% endif %}.
+      </p>
+      {% if q or filter_type %}
+      <a href="/category/{{ category_name }}" class="mt-4 inline-block text-sm text-primary hover:underline">
+        Clear filters
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
+</main>
+{% endblock %}

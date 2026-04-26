@@ -1,0 +1,149 @@
+{% extends "_layout.html" %}
+{% block content %}
+<main class="flex-grow w-full pb-20 pt-10">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Profile header -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-10 pb-10 border-b border-gray-200">
+      {% if profile and profile.avatar_url %}
+        <img src="{{ profile.avatar_url }}" class="w-24 h-24 rounded-full object-cover border border-gray-200 flex-shrink-0">
+      {% else %}
+        <div class="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+          <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+        </div>
+      {% endif %}
+
+      <div class="flex-1">
+        <h1 class="text-2xl font-bold tracking-tight">
+          {% if profile and profile.shop_name %}
+            {{ profile.shop_name }}
+          {% elif seller.first_name or seller.last_name %}
+            {{ seller.first_name }} {{ seller.last_name }}
+          {% else %}
+            {{ seller.email }}
+          {% endif %}
+        </h1>
+        {% if profile and profile.location %}
+          <p class="text-sm text-gray-400 mt-1">📍 {{ profile.location }}</p>
+        {% endif %}
+        {% if avg_rating %}
+          <div class="flex items-center gap-2 mt-2">
+            <span class="text-yellow-400 text-lg">
+              {% for i in range(1, 6) %}{% if i <= avg_rating|round %}★{% else %}☆{% endif %}{% endfor %}
+            </span>
+            <span class="text-sm text-gray-500">{{ avg_rating }} / 5 ({{ reviews|length }} review{{ 's' if reviews|length != 1 else '' }})</span>
+          </div>
+        {% else %}
+          <p class="text-sm text-gray-400 mt-2">No reviews yet</p>
+        {% endif %}
+        {% if profile and profile.bio %}
+          <p class="text-sm text-gray-600 mt-3 max-w-xl">{{ profile.bio }}</p>
+        {% endif %}
+      </div>
+
+      {% if current_user and current_user.id != seller.id and not current_user.is_admin %}
+  <a href="/messages/conversation?with_user={{ seller.id }}"
+    class="flex-shrink-0 inline-flex items-center gap-2 bg-primary text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:bg-red-600 transition">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+    </svg>
+    Message Seller
+  </a>
+{% endif %}
+
+{% if current_user and current_user.id == seller.id %}
+  <a href="/seller/setup"
+    class="flex-shrink-0 border border-gray-300 rounded-lg px-5 py-2.5 text-sm font-medium hover:bg-gray-50 transition">
+    Edit Profile
+  </a>
+{% endif %}
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex gap-1 mb-8 border-b border-gray-200">
+      <button onclick="showTab('products')" id="tab-products"
+        class="tab-btn px-5 py-3 text-sm font-medium border-b-2 border-black text-black -mb-px">
+        Products ({{ products|length }})
+      </button>
+      <button onclick="showTab('reviews')" id="tab-reviews"
+        class="tab-btn px-5 py-3 text-sm font-medium border-b-2 border-transparent text-gray-400 -mb-px hover:text-black transition">
+        Reviews ({{ reviews|length }})
+      </button>
+    </div>
+
+    <!-- Products tab -->
+    <div id="panel-products">
+      {% if products %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for p in products %}
+        <div class="group">
+          <a href="/product-details.html?slug={{ p.slug }}">
+            <div class="bg-gray-50 rounded-xl flex items-center justify-center p-6 h-52 mb-3 border border-gray-100 hover:border-gray-200 transition">
+              <img src="{{ p.image_url }}" alt="{{ p.name }}" class="max-h-full object-contain mix-blend-multiply drop-shadow">
+            </div>
+            <h3 class="text-sm font-medium truncate">{{ p.name }}</h3>
+          </a>
+          <div class="flex items-center justify-between mt-1">
+            <span class="text-primary font-semibold text-sm">{{ money_fmt(p.currency, p.price_minor) }}</span>
+            <a href="/product-details.html?slug={{ p.slug }}" class="text-xs text-gray-400 hover:text-black transition">View →</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="text-center py-16 text-gray-400 text-sm">No active listings yet.</div>
+      {% endif %}
+    </div>
+
+    <!-- Reviews tab -->
+    <div id="panel-reviews" class="hidden">
+      {% if reviews %}
+      <div class="space-y-5">
+        {% for r in reviews %}
+        <div class="rounded-xl border border-gray-200 p-5">
+          <div class="flex items-center justify-between mb-2">
+            <!-- Star display: highlight filled stars up to r.rating -->
+            <div class="flex items-center gap-0.5 text-xl">
+              {% for i in range(1, 6) %}
+                {% if i <= r.rating %}
+                  <span class="text-yellow-400">★</span>
+                {% else %}
+                  <span class="text-gray-200">★</span>
+                {% endif %}
+              {% endfor %}
+            </div>
+            <span class="text-xs text-gray-400 font-mono">{{ r.created_at.strftime("%Y-%m-%d") if r.created_at else '' }}</span>
+          </div>
+          {% if r.comment %}
+            <p class="text-sm text-gray-700">{{ r.comment }}</p>
+          {% else %}
+            <p class="text-sm text-gray-400 italic">No comment left.</p>
+          {% endif %}
+          <p class="text-xs text-gray-400 mt-2">Order #{{ r.order_id }}</p>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="text-center py-16 text-gray-400 text-sm">No reviews yet.</div>
+      {% endif %}
+    </div>
+
+  </div>
+</main>
+
+<script>
+  function showTab(name) {
+    ['products', 'reviews'].forEach(t => {
+      document.getElementById('panel-' + t).classList.toggle('hidden', t !== name);
+      const btn = document.getElementById('tab-' + t);
+      btn.classList.toggle('border-black', t === name);
+      btn.classList.toggle('text-black', t === name);
+      btn.classList.toggle('border-transparent', t !== name);
+      btn.classList.toggle('text-gray-400', t !== name);
+    });
+  }
+</script>
+{% endblock %}

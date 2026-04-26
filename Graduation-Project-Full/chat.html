@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listables - Chat with Seller</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#DB4444',
+                        secondary: '#F5F5F5',
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Custom scrollbar for chat */
+        .chat-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-scroll::-webkit-scrollbar-thumb {
+            background: #E5E7EB;
+            border-radius: 10px;
+        }
+
+        .chat-scroll::-webkit-scrollbar-thumb:hover {
+            background: #D1D5DB;
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased text-gray-900 bg-white min-h-screen flex flex-col">
+
+    <!-- Global Top Header -->
+    <header class="border-b border-gray-200 bg-white z-10">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-[88px]">
+                <div class="flex-shrink-0">
+                    <a href="index.html" class="text-2xl font-bold tracking-tight text-black">Listables</a>
+                </div>
+
+                <nav class="hidden md:flex space-x-12">
+                    <a href="index.html" class="text-gray-900 text-[15px] font-medium hover:text-black">Home</a>
+                    <a href="#" class="text-gray-900 text-[15px] font-medium hover:text-black">Contact</a>
+                    <a href="#" class="text-gray-900 text-[15px] font-medium hover:text-black">About</a>
+                </nav>
+
+                <div class="flex items-center space-x-6">
+                    <div class="relative hidden sm:block">
+                        <input type="text" placeholder="What are you looking for?"
+                            class="bg-[#F5F5F5] rounded text-[13px] px-4 py-2.5 w-[240px] focus:outline-none focus:ring-1 pr-10">
+                        <button class="absolute right-3 top-2.5 text-black">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-5">
+                        <a href="wishlist.html" class="text-black hover:text-gray-600 relative">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                </path>
+                            </svg>
+                            <span
+                                class="absolute -top-1.5 -right-1.5 bg-[#DB4444] text-white text-[10px] w-[16px] h-[16px] flex items-center justify-center rounded-full font-medium">4</span>
+                        </a>
+                        <a href="my-account.html" class="text-black hover:text-gray-600 transition">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Chat Interface -->
+    <main class="flex-grow flex w-full max-w-[1440px] mx-auto overflow-hidden" style="height: calc(100vh - 88px);">
+
+        <!-- Sidebar -->
+        <div class="w-64 xl:w-80 border-r border-[#E5E5E5] flex flex-col flex-shrink-0">
+            <!-- Active Chat User -->
+            <div
+                class="p-5 flex items-center bg-gray-50 border-b border-[#E5E5E5] cursor-pointer hover:bg-gray-100 transition">
+                <div
+                    class="w-11 h-11 rounded-full bg-[#0095FF] flex items-center justify-center text-white mr-4 shadow-sm relative">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                </div>
+                <span class="font-bold text-[17px] text-black tracking-wide">Seller</span>
+            </div>
+
+            <!-- Other chats would populate here -->
+            <div class="flex-1 overflow-y-auto chat-scroll bg-white">
+                <!-- Empty padding or inactive chats -->
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="flex-1 flex flex-col bg-white overflow-hidden">
+            <!-- Messages -->
+            <div class="flex-1 p-8 overflow-y-auto chat-scroll space-y-10 pl-6 lg:pl-12">
+
+                <!-- You Message -->
+                <div class="flex items-start">
+                    <div class="mr-4 flex flex-col items-center mt-2">
+                        <span class="font-bold text-[15px] text-black mb-1">You</span>
+                        <div
+                            class="w-11 h-11 rounded-full border border-gray-400 flex items-center justify-center text-gray-500 bg-white z-10">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div
+                        class="bg-[#F8F9FA] rounded-[32px] rounded-tl-xl py-[22px] px-8 max-w-[650px] text-[15px] border border-gray-300 shadow-sm leading-relaxed text-black">
+                        I received the item today and it's not as described. You said it was "like new," but there are
+                        clear scratches and it doesn't work properly. I want a refund.
+                    </div>
+                </div>
+
+                <!-- Seller Message -->
+                <div class="flex items-start justify-end pr-6 lg:pr-12">
+                    <div
+                        class="bg-[#F0F8FF] rounded-[32px] rounded-tr-xl py-[22px] px-8 max-w-[650px] text-[15px] border border-[#A2D3F9] shadow-sm leading-relaxed text-black">
+                        I'm sorry you're unhappy, but it was working fine when I shipped it and the condition was shown
+                        in the photos. Damage could've happened during delivery—please check with the courier or send me
+                        a video so we can sort this out
+                    </div>
+                    <div class="ml-4 flex flex-col items-center relative mt-2">
+                        <div
+                            class="w-11 h-11 rounded-full bg-[#0095FF] flex items-center justify-center text-white relative z-10">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            <div class="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
+                                <svg class="w-3.5 h-3.5 text-[#0095FF]" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <span class="font-bold text-[15px] text-black mt-1">Seller</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Input Area -->
+            <div class="px-8 pb-10 pt-4 bg-white mt-auto w-full max-w-[1000px] ml-4">
+                <div class="relative w-full">
+                    <input type="text" placeholder="Type your message..."
+                        class="w-full bg-[#F5F5F5] border border-gray-300 text-black placeholder-gray-500 rounded-full py-[18px] px-8 text-lg focus:outline-none focus:ring-1 focus:ring-gray-300 shadow-sm pr-16">
+                    <button
+                        class="absolute right-4 top-2 bottom-2 aspect-square rounded-full flex items-center justify-center hover:bg-gray-200 transition">
+                        <svg class="w-8 h-8 text-black" fill="currentColor" viewBox="0 0 20 20"
+                            style="transform: rotate(35deg);">
+                            <path
+                                d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

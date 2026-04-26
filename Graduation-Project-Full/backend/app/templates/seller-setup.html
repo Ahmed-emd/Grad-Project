@@ -1,0 +1,59 @@
+{% extends "_layout.html" %}
+{% block content %}
+<main class="flex-grow w-full pb-20 pt-10">
+  <div class="max-w-xl mx-auto px-4 sm:px-6">
+
+    <h1 class="text-2xl font-bold tracking-tight mb-2">
+      {% if profile %}Edit Your Shop{% else %}Set Up Your Shop{% endif %}
+    </h1>
+    <p class="text-sm text-gray-500 mb-8">This is your public seller profile visible to all buyers.</p>
+
+    <form method="post" action="/seller/setup" enctype="multipart/form-data" class="space-y-6">
+
+      <div>
+        <label class="block text-sm text-gray-500 mb-2">Shop Name <span class="text-primary">*</span></label>
+        <input name="shop_name" type="text" required
+          value="{{ profile.shop_name if profile else '' }}"
+          class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300">
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-500 mb-2">Bio</label>
+        <textarea name="bio" rows="4"
+          class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300"
+          placeholder="Tell buyers about yourself and what you sell…">{{ profile.bio if profile else '' }}</textarea>
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-500 mb-2">Location</label>
+        <input name="location" type="text"
+          value="{{ profile.location if profile else '' }}"
+          placeholder="e.g. Cairo, Egypt"
+          class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300">
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-500 mb-2">Phone</label>
+        <input name="phone" type="tel"
+          value="{{ profile.phone if profile else '' }}"
+          class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300">
+      </div>
+
+      <div>
+        <label class="block text-sm text-gray-500 mb-2">Profile Photo</label>
+        {% if profile and profile.avatar_url %}
+          <img src="{{ profile.avatar_url }}" class="w-20 h-20 rounded-full object-cover border border-gray-200 mb-3">
+        {% endif %}
+        <input type="file" name="avatar_file" accept="image/jpeg,image/png,image/webp"
+          class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-black file:text-white hover:file:bg-gray-800 transition">
+      </div>
+
+      <button type="submit"
+        class="w-full bg-primary text-white py-3 rounded-lg text-sm font-medium hover:bg-red-600 transition">
+        Save Profile
+      </button>
+
+    </form>
+  </div>
+</main>
+{% endblock %}

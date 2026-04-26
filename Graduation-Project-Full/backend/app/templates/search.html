@@ -1,0 +1,46 @@
+{% extends "_layout.html" %}
+{% block content %}
+<main class="flex-grow w-full pb-20 pt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-end justify-between mb-8">
+      <div>
+        <h1 class="text-3xl font-bold tracking-tight">Search</h1>
+        {% if q %}
+        <p class="text-sm text-gray-500 mt-2">Results for "{{ q }}"</p>
+        {% endif %}
+      </div>
+      <a href="/index.html"
+        class="inline-block border border-gray-400 text-black rounded px-6 py-3 text-sm font-medium hover:bg-gray-50 transition">Back</a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {% for p in products %}
+      <div class="group relative">
+        <div class="bg-secondary rounded relative flex flex-col items-center justify-center p-6 h-64 mb-4">
+          <a class="absolute inset-0" href="/product-details.html?slug={{ p.slug }}" aria-label="View {{ p.name }}"></a>
+          <img src="{{ p.image_url }}" alt="{{ p.name }}"
+            class="max-h-full object-contain mix-blend-multiply drop-shadow">
+        </div>
+        <h3 class="text-sm font-medium text-black truncate">{{ p.name }}</h3>
+        <div class="flex items-center justify-between mt-2 text-sm">
+          <span class="text-primary font-medium">{{ money_fmt(p.currency, p.price_minor) }}</span>
+          <form method="post" action="/cart/add" class="relative z-10">
+            <input type="hidden" name="product_id" value="{{ p.id }}">
+            <input type="hidden" name="qty" value="1">
+            <button type="submit"
+              class="bg-black text-white text-xs px-3 py-2 rounded hover:bg-gray-800 transition">Add</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% if products|length == 0 %}
+    <div class="mt-10 bg-secondary border border-gray-200 rounded px-6 py-10 text-center">
+      <p class="text-[15px]">No products found.</p>
+    </div>
+    {% endif %}
+  </div>
+</main>
+{% endblock %}
+

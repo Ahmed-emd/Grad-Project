@@ -1,0 +1,80 @@
+{% extends "_layout.html" %}
+{% block content %}
+<main class="flex-grow w-full pb-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+
+    <div class="flex items-center space-x-4 text-primary font-semibold mb-2">
+      <span class="w-5 h-10 bg-primary rounded-sm"></span>
+      <span>Wishlist</span>
+    </div>
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="text-3xl font-bold tracking-tight">My Wishlist ({{ products|length }})</h1>
+      {% if products %}
+      <form method="post" action="/cart/add" id="add-all-form">
+        <a href="/search.html" class="text-sm font-medium text-gray-600 hover:text-black border border-gray-300 rounded px-4 py-2 transition hover:border-black">
+          Continue Shopping
+        </a>
+      </form>
+      {% endif %}
+    </div>
+
+    {% if products %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {% for product in products %}
+      <div class="group relative border border-gray-100 rounded-xl overflow-hidden hover:shadow-md transition">
+
+        <div class="bg-secondary relative flex items-center justify-center p-6 h-52 overflow-hidden">
+          <div class="absolute top-3 right-3">
+            <form method="post" action="/wishlist/remove">
+              <input type="hidden" name="product_id" value="{{ product.id }}">
+              <button type="submit" class="bg-white rounded-full p-1.5 shadow-sm hover:bg-red-50 transition" title="Remove from wishlist">
+                <svg class="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                </svg>
+              </button>
+            </form>
+          </div>
+          <a href="/product-details.html?slug={{ product.slug }}">
+            <img src="{{ product.image_url }}" alt="{{ product.name }}" class="max-h-full object-contain mix-blend-multiply drop-shadow">
+          </a>
+          <div class="absolute bottom-0 left-0 right-0 bg-black text-white text-center py-2 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+            <form method="post" action="/cart/add">
+              <input type="hidden" name="product_id" value="{{ product.id }}">
+              <input type="hidden" name="qty" value="1">
+              <button type="submit" class="w-full">Add To Cart</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="p-4">
+          <a href="/product-details.html?slug={{ product.slug }}">
+            <h3 class="text-sm font-medium text-black hover:underline truncate">{{ product.name }}</h3>
+          </a>
+          <div class="flex items-center justify-between mt-1">
+            <span class="text-primary font-semibold text-sm">{{ money_fmt(product.currency, product.price_minor) }}</span>
+            <span class="text-gray-400 text-xs">Stock: {{ product.stock_qty }}</span>
+          </div>
+        </div>
+
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="flex flex-col items-center justify-center py-24 text-center border-2 border-dashed border-gray-200 rounded-2xl bg-gray-50">
+      <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-semibold text-gray-700 mb-1">Your wishlist is empty</h3>
+      <p class="text-sm text-gray-500 mb-5">Browse products and click the heart icon to save them here.</p>
+      <a href="/search.html" class="inline-block bg-primary text-white rounded px-8 py-2.5 text-sm font-medium hover:bg-red-600 transition">
+        Browse Products
+      </a>
+    </div>
+    {% endif %}
+
+  </div>
+</main>
+{% endblock %}

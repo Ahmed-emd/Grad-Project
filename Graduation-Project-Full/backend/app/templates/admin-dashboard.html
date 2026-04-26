@@ -1,0 +1,513 @@
+{% extends "_admin_layout.html" %}
+{% set active_page = 'orders' %}
+{% block content %}
+<div class="p-8">
+
+  <div class="mb-8">
+    <div class="font-mono text-accent text-xs tracking-widest uppercase mb-2">Admin / Orders</div>
+    <h1 class="font-display text-3xl font-bold text-bright">All Orders</h1>
+    <p class="text-muted text-sm mt-1 font-mono">{{ orders_data|length }} total records</p>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="grid grid-cols-4 gap-4 mb-8">
+    {% set total_orders = orders_data|length %}
+    {% set completed_orders = orders_data|selectattr('order.status', 'equalto', 'completed')|list|length %}
+    {% set pending_orders = orders_data|selectattr('order.status', 'equalto', 'pending')|list|length %}
+    {% set cancelled_orders = orders_data|selectattr('order.status', 'equalto', 'cancelled')|list|length %}
+    <div class="stat-card rounded-xl p-5">
+      <div class="text-muted font-mono text-xs uppercase tracking-wider mb-3">Total Orders</div>
+      <div class="text-3xl font-bold text-bright font-display">{{ total_orders }}</div>
+    </div>
+    <div class="stat-card rounded-xl p-5">
+      <div class="text-muted font-mono text-xs uppercase tracking-wider mb-3">Completed</div>
+      <div class="text-3xl font-bold text-green-400 font-display">{{ completed_orders }}</div>
+    </div>
+    <div class="stat-card rounded-xl p-5">
+      <div class="text-muted font-mono text-xs uppercase tracking-wider mb-3">Cancelled</div>
+      <div class="text-3xl font-bold text-red-400 font-display">{{ cancelled_orders }}</div>
+    </div>
+    <div class="stat-card rounded-xl p-5">
+      <div class="text-muted font-mono text-xs uppercase tracking-wider mb-3">Pending</div>
+      <div class="text-3xl font-bold text-yellow-400 font-display">{{ pending_orders }}</div>
+    </div>
+  </div>
+
+  <!-- Escrow Confirmations Panel -->
+  {% set escrow_pending = orders_data | selectattr('seller_confirmed') | selectattr('buyer_confirmed') | rejectattr('order.status', 'equalto', 'completed') | rejectattr('order.status', 'equalto', 'cancelled') | list %}
+  {% if escrow_pending %}
+  <div class="mb-8">
+    <div class="font-mono text-xs text-muted uppercase tracking-widest mb-3">
+      🔒 Escrow Confirmations — Action Required ({{ escrow_pending|length }})
+    </div>
+    <div class="space-y-3">
+      {% for row in escrow_pending %}
+      {% set o = row.order %}
+      <div class="stat-card rounded-xl p-5 border border-green-500/30">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="font-mono text-accent font-bold">Order #{{ o.id }}</span>
+              <span class="bg-green-900/40 text-green-400 text-xs font-semibold px-2.5 py-1 rounded-md font-mono">
+                ✓ Both Confirmed
+              </span>
+            </div>
+            <div class="text-sm text-muted space-y-1">
+              <p>Customer: <span class="text-bright font-medium">{{ o.customer_first_name }} ({{ o.customer_email }})</span></p>
+              <p>Total: <span class="text-bright font-semibold">{{ money_fmt(o.currency, o.total_minor) }}</span></p>
+              <p>Placed: <span class="text-bright">{{ o.created_at.strftime("%d %b %Y %H:%M") if o.created_at else '—' }}</span></p>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            {% if row.seller_proof %}
+            <div class="text-center">
+              <p class="font-mono text-xs text-muted mb-1">Seller Proof</p>
+              <img src="{{ row.seller_proof }}" onclick="openProof('{{ row.seller_proof }}')"
+                class="w-20 h-20 object-cover rounded-lg border border-green-500/30 hover:opacity-80 transition cursor-pointer">
+            </div>
+            {% endif %}
+            {% if row.buyer_proof %}
+            <div class="text-center">
+              <p class="font-mono text-xs text-muted mb-1">Buyer Proof</p>
+              <img src="{{ row.buyer_proof }}" onclick="openProof('{{ row.buyer_proof }}')"
+                class="w-20 h-20 object-cover rounded-lg border border-green-500/30 hover:opacity-80 transition cursor-pointer">
+            </div>
+            {% endif %}
+          </div>
+          <div class="flex-shrink-0">
+            <form method="post" action="/admin/orders/{{ o.id }}/complete"
+              onsubmit="return confirm('Release payment for Order #{{ o.id }} to the seller?')">
+              <button type="submit"
+                class="w-full md:w-auto px-6 py-3 rounded-lg bg-green-600 hover:bg-green-500 text-white font-mono text-xs uppercase tracking-wider font-semibold transition-colors">
+                ✓ Release Payment
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Filter tabs -->
+  <div class="flex items-center gap-2 mb-5">
+    <button onclick="filterOrders('all')" id="filter-all"
+      class="filter-btn active-filter px-4 py-2 rounded-lg font-mono text-xs uppercase tracking-wider transition-colors">All</button>
+    <button onclick="filterOrders('pending')" id="filter-pending"
+      class="filter-btn px-4 py-2 rounded-lg font-mono text-xs uppercase tracking-wider transition-colors">Pending</button>
+    <button onclick="filterOrders('completed')" id="filter-completed"
+      class="filter-btn px-4 py-2 rounded-lg font-mono text-xs uppercase tracking-wider transition-colors">Completed</button>
+    <button onclick="filterOrders('cancelled')" id="filter-cancelled"
+      class="filter-btn px-4 py-2 rounded-lg font-mono text-xs uppercase tracking-wider transition-colors">Cancelled</button>
+    <button onclick="filterOrders('unidentified')" id="filter-unidentified"
+      class="filter-btn px-4 py-2 rounded-lg font-mono text-xs uppercase tracking-wider transition-colors">Other</button>
+  </div>
+
+  {% if orders_data|length == 0 %}
+  <div class="stat-card rounded-xl p-16 text-center">
+    <div class="text-muted font-mono text-sm">No orders yet.</div>
+  </div>
+  {% else %}
+  <div class="stat-card rounded-xl overflow-hidden">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-border">
+          <th class="text-left px-5 py-4 font-mono text-xs text-muted uppercase tracking-wider">Order</th>
+          <th class="text-left px-5 py-4 font-mono text-xs text-muted uppercase tracking-wider">Customer</th>
+          <th class="text-left px-5 py-4 font-mono text-xs text-muted uppercase tracking-wider">Total</th>
+          <th class="text-left px-5 py-4 font-mono text-xs text-muted uppercase tracking-wider">Status</th>
+          <th class="text-left px-5 py-4 font-mono text-xs text-muted uppercase tracking-wider">Escrow</th>
+          <th class="text-left px-5 py-4 font-mono text-xs text-muted uppercase tracking-wider">Date</th>
+          <th class="px-5 py-4"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-border" id="orders-tbody">
+        {% for row in orders_data %}
+        {% set o = row.order %}
+        <tr class="hover:bg-dim transition-colors order-row" data-status="{{ o.status }}">
+          <td class="px-5 py-4 font-mono text-accent font-semibold">#{{ o.id }}</td>
+          <td class="px-5 py-4">
+            <div class="text-bright text-sm">{{ o.customer_first_name or '—' }}</div>
+            <div class="text-muted font-mono text-xs mt-0.5">{{ o.customer_email or '—' }}</div>
+          </td>
+          <td class="px-5 py-4 font-mono text-bright font-semibold">{{ money_fmt(o.currency, o.total_minor) }}</td>
+          <td class="px-5 py-4">
+            {% if o.status == 'paid' %}
+              <span class="badge-paid inline-flex px-2.5 py-1 rounded-md font-mono text-xs font-semibold">paid</span>
+            {% elif o.status == 'pending' %}
+              <span class="badge-pending inline-flex px-2.5 py-1 rounded-md font-mono text-xs font-semibold">pending</span>
+            {% elif o.status == 'cancelled' %}
+              <span class="inline-flex px-2.5 py-1 rounded-md font-mono text-xs font-semibold bg-red-900/40 text-red-400">cancelled</span>
+            {% elif o.status == 'completed' %}
+              <span class="inline-flex px-2.5 py-1 rounded-md font-mono text-xs font-semibold bg-green-900/40 text-green-400">completed</span>
+            {% else %}
+              <span class="badge-unidentified inline-flex px-2.5 py-1 rounded-md font-mono text-xs font-semibold">{{ o.status }}</span>
+            {% endif %}
+          </td>
+
+          <!-- Escrow column: detailed status + proof thumbnails -->
+          <td class="px-5 py-4">
+            <div class="flex flex-col gap-1.5">
+              <!-- Seller row -->
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-xs w-10 text-muted">Seller</span>
+                {% if row.seller_confirmed %}
+                  <span class="text-green-400 text-xs font-semibold">✓ confirmed</span>
+                  {% if row.seller_proof %}
+                    <img src="{{ row.seller_proof }}" onclick="openProof('{{ row.seller_proof }}')"
+                      class="w-7 h-7 rounded object-cover border border-green-500/40 cursor-pointer hover:opacity-75 transition ml-1"
+                      title="View seller proof">
+                  {% endif %}
+                {% else %}
+                  <span class="text-gray-600 text-xs">✗ waiting</span>
+                {% endif %}
+              </div>
+              <!-- Buyer row -->
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-xs w-10 text-muted">Buyer</span>
+                {% if row.buyer_confirmed %}
+                  <span class="text-green-400 text-xs font-semibold">✓ confirmed</span>
+                  {% if row.buyer_proof %}
+                    <img src="{{ row.buyer_proof }}" onclick="openProof('{{ row.buyer_proof }}')"
+                      class="w-7 h-7 rounded object-cover border border-green-500/40 cursor-pointer hover:opacity-75 transition ml-1"
+                      title="View buyer proof">
+                  {% endif %}
+                {% else %}
+                  <span class="text-gray-600 text-xs">✗ waiting</span>
+                {% endif %}
+              </div>
+            </div>
+          </td>
+
+          <td class="px-5 py-4 font-mono text-muted text-xs">{{ o.created_at.strftime("%Y-%m-%d %H:%M") if o.created_at else '—' }}</td>
+          <td class="px-5 py-4">
+            <div class="flex items-center gap-2 justify-end">
+              <button
+                onclick="openOrderModal({{ o.id }}, '{{ o.customer_first_name|e }}', '{{ o.customer_email|e }}', '{{ o.customer_phone|e }}', '{{ o.address_line1|e }}', '{{ o.address_line2|e }}', '{{ o.city|e }}', '{{ o.status }}', '{{ o.created_at.strftime("%Y-%m-%d %H:%M") if o.created_at else "" }}', '{{ money_fmt(o.currency, o.total_minor)|e }}', {{ row.items_json }})"
+                class="px-3 py-1.5 rounded-lg border border-border text-muted hover:text-bright hover:border-bright font-mono text-xs transition-colors">
+                View
+              </button>
+              <form method="post" action="/admin/orders/{{ o.id }}/delete" onsubmit="return confirm('Delete order #{{ o.id }}?')">
+                <button type="submit" class="px-3 py-1.5 rounded-lg border border-accent/30 text-accent hover:bg-accent hover:text-white font-mono text-xs transition-colors">
+                  Delete
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div id="no-filter-results" class="hidden p-12 text-center font-mono text-sm text-muted">
+      No orders match this filter.
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Proof image lightbox -->
+<div id="proofModal" class="fixed inset-0 z-[60] hidden items-center justify-center">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeProof()"></div>
+  <div class="relative z-10 max-w-2xl w-full mx-4">
+    <button onclick="closeProof()" class="absolute -top-10 right-0 text-white/70 hover:text-white text-sm font-mono">✕ close</button>
+    <img id="proof-img" src="" class="w-full rounded-xl border border-white/10 shadow-2xl">
+  </div>
+</div>
+
+<!-- Order Modal -->
+<div id="orderModal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeOrderModal()"></div>
+  <div class="absolute right-0 top-0 h-full w-full max-w-md bg-surface border-l border-border flex flex-col overflow-y-auto">
+
+    <div class="flex items-center justify-between px-6 py-5 border-b border-border">
+      <h2 class="font-display text-lg font-bold text-bright" id="modal-title">Order Details</h2>
+      <button onclick="closeOrderModal()" class="text-muted hover:text-bright transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="modal-view" class="px-6 py-5 flex-1 space-y-6">
+      <div class="flex items-center gap-3">
+        <span id="modal-status-badge" class="font-mono text-xs px-2.5 py-1 rounded-md font-semibold"></span>
+        <span id="modal-date" class="font-mono text-xs text-muted"></span>
+      </div>
+      <div>
+        <div class="font-mono text-xs text-muted uppercase tracking-wider mb-3">Customer</div>
+        <div class="bg-card rounded-lg p-4 space-y-2 border border-border">
+          <div class="flex justify-between text-sm">
+            <span class="text-muted">Name</span>
+            <span class="text-bright font-medium" id="modal-name"></span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-muted">Email</span>
+            <span class="text-bright font-medium font-mono text-xs" id="modal-email"></span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-muted">Phone</span>
+            <span class="text-bright font-medium" id="modal-phone"></span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="font-mono text-xs text-muted uppercase tracking-wider mb-3">Shipping</div>
+        <div class="bg-card rounded-lg p-4 border border-border text-sm text-bright" id="modal-address"></div>
+      </div>
+      <div>
+        <div class="font-mono text-xs text-muted uppercase tracking-wider mb-3">Items</div>
+        <div id="modal-items" class="space-y-2"></div>
+      </div>
+      <div class="border-t border-border pt-4 flex justify-between items-center">
+        <span class="font-display font-semibold text-bright">Total</span>
+        <span class="font-mono font-bold text-lg text-accent" id="modal-total"></span>
+      </div>
+      <div class="flex flex-col gap-2 pt-2">
+        <button onclick="switchToEdit()"
+          class="w-full py-2.5 rounded-lg border border-border text-bright hover:border-bright font-mono text-xs uppercase tracking-wider transition-colors">
+          Edit Order
+        </button>
+        <button id="btn-cancel-order" onclick="cancelOrder()"
+          class="w-full py-2.5 rounded-lg border border-yellow-500/40 text-yellow-400 hover:bg-yellow-500/10 font-mono text-xs uppercase tracking-wider transition-colors">
+          Mark as Cancelled
+        </button>
+        <button id="btn-complete-order" onclick="completeOrder()"
+          class="w-full py-2.5 rounded-lg border border-green-500/40 text-green-400 hover:bg-green-500/10 font-mono text-xs uppercase tracking-wider transition-colors">
+          ✓ Complete Order & Release Payment
+        </button>
+        <button id="btn-delete-order" onclick="deleteOrder()"
+          class="w-full py-2.5 rounded-lg border border-accent/30 text-accent hover:bg-accent/10 font-mono text-xs uppercase tracking-wider transition-colors">
+          Delete Order
+        </button>
+      </div>
+    </div>
+
+    <div id="modal-edit" class="px-6 py-5 flex-1 space-y-5 hidden">
+      <div class="flex items-center gap-2 mb-1">
+        <button onclick="switchToView()" class="text-muted hover:text-bright transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <span class="font-mono text-xs text-muted uppercase tracking-wider">Edit Order</span>
+      </div>
+      <div>
+        <label class="font-mono text-xs text-muted uppercase tracking-wider block mb-2">Status</label>
+        <select id="edit-status"
+          class="w-full bg-card border border-border rounded-lg px-4 py-2.5 text-sm text-bright focus:outline-none focus:border-accent font-mono">
+          <option value="pending">pending</option>
+          <option value="paid">paid</option>
+          <option value="cancelled">cancelled</option>
+          <option value="completed">completed</option>
+          <option value="unidentified">unidentified</option>
+        </select>
+      </div>
+      <div>
+        <label class="font-mono text-xs text-muted uppercase tracking-wider block mb-2">Customer Name</label>
+        <input id="edit-name" type="text" class="w-full bg-card border border-border rounded-lg px-4 py-2.5 text-sm text-bright focus:outline-none focus:border-accent">
+      </div>
+      <div>
+        <label class="font-mono text-xs text-muted uppercase tracking-wider block mb-2">Email</label>
+        <input id="edit-email" type="email" class="w-full bg-card border border-border rounded-lg px-4 py-2.5 text-sm text-bright focus:outline-none focus:border-accent font-mono">
+      </div>
+      <div>
+        <label class="font-mono text-xs text-muted uppercase tracking-wider block mb-2">Phone</label>
+        <input id="edit-phone" type="text" class="w-full bg-card border border-border rounded-lg px-4 py-2.5 text-sm text-bright focus:outline-none focus:border-accent">
+      </div>
+      <div>
+        <label class="font-mono text-xs text-muted uppercase tracking-wider block mb-2">Address Line 1</label>
+        <input id="edit-addr1" type="text" class="w-full bg-card border border-border rounded-lg px-4 py-2.5 text-sm text-bright focus:outline-none focus:border-accent">
+      </div>
+      <div>
+        <label class="font-mono text-xs text-muted uppercase tracking-wider block mb-2">Address Line 2</label>
+        <input id="edit-addr2" type="text" class="w-full bg-card border border-border rounded-lg px-4 py-2.5 text-sm text-bright focus:outline-none focus:border-accent">
+      </div>
+      <div>
+        <label class="font-mono text-xs text-muted uppercase tracking-wider block mb-2">City</label>
+        <input id="edit-city" type="text" class="w-full bg-card border border-border rounded-lg px-4 py-2.5 text-sm text-bright focus:outline-none focus:border-accent">
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button onclick="switchToView()"
+          class="flex-1 py-2.5 rounded-lg border border-border text-muted hover:text-bright font-mono text-xs uppercase tracking-wider transition-colors">
+          Cancel
+        </button>
+        <button onclick="saveEdit()"
+          class="flex-1 py-2.5 rounded-lg bg-accent text-white hover:bg-red-600 font-mono text-xs uppercase tracking-wider transition-colors">
+          Save Changes
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .filter-btn {
+    background: transparent;
+    border: 1px solid var(--color-border, #333);
+    color: var(--color-muted, #888);
+  }
+  .filter-btn:hover { color: var(--color-bright, #fff); border-color: var(--color-bright, #fff); }
+  .active-filter { background: var(--color-accent, #e11d48); border-color: var(--color-accent, #e11d48); color: #fff !important; }
+</style>
+
+<script>
+  let _currentOrderId = null;
+  let _currentStatus  = null;
+
+  // ── Proof lightbox ────────────────────────────────────────────
+  function openProof(url) {
+    document.getElementById('proof-img').src = url;
+    const m = document.getElementById('proofModal');
+    m.classList.remove('hidden');
+    m.classList.add('flex');
+  }
+  function closeProof() {
+    const m = document.getElementById('proofModal');
+    m.classList.add('hidden');
+    m.classList.remove('flex');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeProof(); closeOrderModal(); } });
+
+  // ── Filter ────────────────────────────────────────────────────
+  function filterOrders(status) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active-filter'));
+    document.getElementById('filter-' + status)?.classList.add('active-filter');
+    const rows = document.querySelectorAll('.order-row');
+    let visible = 0;
+    rows.forEach(row => {
+      const s = row.dataset.status;
+      const show = status === 'all' || s === status ||
+                   (status === 'unidentified' && s !== 'paid' && s !== 'pending' && s !== 'cancelled' && s !== 'completed');
+      row.classList.toggle('hidden', !show);
+      if (show) visible++;
+    });
+    document.getElementById('no-filter-results').classList.toggle('hidden', visible > 0);
+  }
+
+  // ── Modal ─────────────────────────────────────────────────────
+  function openOrderModal(id, name, email, phone, addr1, addr2, city, status, date, total, items) {
+    _currentOrderId = id;
+    _currentStatus  = status;
+    document.getElementById('modal-title').textContent = 'Order #' + id;
+    document.getElementById('modal-name').textContent  = name  || '—';
+    document.getElementById('modal-email').textContent = email || '—';
+    document.getElementById('modal-phone').textContent = phone || '—';
+    document.getElementById('modal-date').textContent  = date  || '—';
+    document.getElementById('modal-total').textContent = total;
+    let addr = addr1 || '';
+    if (addr2) addr += ', ' + addr2;
+    if (city)  addr += ', ' + city;
+    document.getElementById('modal-address').textContent = addr || '—';
+    const badge = document.getElementById('modal-status-badge');
+    badge.textContent = status;
+    badge.className = 'font-mono text-xs px-2.5 py-1 rounded-md font-semibold ';
+    if (status === 'paid')           badge.className += 'badge-paid';
+    else if (status === 'pending')   badge.className += 'badge-pending';
+    else if (status === 'cancelled') badge.className += 'bg-red-900/40 text-red-400';
+    else if (status === 'completed') badge.className += 'bg-green-900/40 text-green-400';
+    else                             badge.className += 'badge-unidentified';
+    document.getElementById('btn-cancel-order').classList.toggle('hidden', status === 'cancelled' || status === 'completed');
+    document.getElementById('btn-complete-order').classList.toggle('hidden', status === 'completed');
+    const container = document.getElementById('modal-items');
+    container.innerHTML = '';
+    items.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'flex items-center gap-3 bg-card rounded-lg p-3 border border-border';
+      div.innerHTML = `
+        <img src="${item.image_url}" alt="${item.product_name}"
+          class="w-10 h-10 object-cover rounded border border-border flex-shrink-0"
+          onerror="this.style.display='none'">
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-bright truncate">${item.product_name}</p>
+          <p class="font-mono text-xs text-muted">Qty: ${item.qty}</p>
+        </div>
+        <p class="font-mono text-sm font-semibold text-accent flex-shrink-0">${item.line_total_fmt}</p>
+      `;
+      container.appendChild(div);
+    });
+    document.getElementById('edit-status').value = status;
+    document.getElementById('edit-name').value   = name;
+    document.getElementById('edit-email').value  = email;
+    document.getElementById('edit-phone').value  = phone;
+    document.getElementById('edit-addr1').value  = addr1;
+    document.getElementById('edit-addr2').value  = addr2;
+    document.getElementById('edit-city').value   = city;
+    switchToView();
+    document.getElementById('orderModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeOrderModal() {
+    document.getElementById('orderModal').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  function switchToView() {
+    document.getElementById('modal-view').classList.remove('hidden');
+    document.getElementById('modal-edit').classList.add('hidden');
+  }
+
+  function switchToEdit() {
+    document.getElementById('modal-view').classList.add('hidden');
+    document.getElementById('modal-edit').classList.remove('hidden');
+  }
+
+  function cancelOrder() {
+    if (!confirm('Mark order #' + _currentOrderId + ' as cancelled?')) return;
+    submitStatusForm(_currentOrderId, 'cancelled');
+  }
+
+  function completeOrder() {
+    if (!confirm('Mark order #' + _currentOrderId + ' as completed and release payment to seller?')) return;
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.action = '/admin/orders/' + _currentOrderId + '/complete';
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  function deleteOrder() {
+    if (!confirm('Permanently delete order #' + _currentOrderId + '? This cannot be undone.')) return;
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.action = '/admin/orders/' + _currentOrderId + '/delete';
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  function saveEdit() {
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.action = '/admin/orders/' + _currentOrderId + '/edit';
+    const fields = {
+      status: document.getElementById('edit-status').value,
+      name:   document.getElementById('edit-name').value,
+      email:  document.getElementById('edit-email').value,
+      phone:  document.getElementById('edit-phone').value,
+      addr1:  document.getElementById('edit-addr1').value,
+      addr2:  document.getElementById('edit-addr2').value,
+      city:   document.getElementById('edit-city').value,
+    };
+    for (const [k, v] of Object.entries(fields)) {
+      const input = document.createElement('input');
+      input.type = 'hidden'; input.name = k; input.value = v;
+      form.appendChild(input);
+    }
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+  function submitStatusForm(orderId, status) {
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.action = '/admin/orders/' + orderId + '/edit';
+    const input = document.createElement('input');
+    input.type = 'hidden'; input.name = 'status'; input.value = status;
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+  }
+</script>
+{% endblock %}

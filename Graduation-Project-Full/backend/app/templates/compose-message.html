@@ -1,0 +1,82 @@
+{% extends "_layout.html" %}
+{% block content %}
+<main class="flex-grow w-full pb-20 pt-10">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6">
+
+    <!-- Back link -->
+    {% if product %}
+    <a href="/product-details.html?slug={{ product.slug }}"
+      class="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-black transition mb-8">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Back to product
+    </a>
+    {% endif %}
+
+    <h1 class="text-2xl font-bold tracking-tight mb-8">Message Seller</h1>
+
+    <!-- Seller card -->
+    <div class="flex items-center gap-4 p-4 rounded-xl border border-gray-100 bg-gray-50 mb-8">
+      {% if profile and profile.avatar_url %}
+        <img src="{{ profile.avatar_url }}" class="w-12 h-12 rounded-full object-cover border border-gray-200 flex-shrink-0">
+      {% else %}
+        <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+          <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+        </div>
+      {% endif %}
+      <div>
+        <p class="font-semibold text-sm">
+          {% if profile and profile.shop_name %}{{ profile.shop_name }}
+          {% else %}{{ seller.email }}{% endif %}
+        </p>
+        {% if profile and profile.location %}
+          <p class="text-xs text-gray-400">📍 {{ profile.location }}</p>
+        {% endif %}
+      </div>
+      <a href="/seller/{{ seller.id }}"
+        class="ml-auto text-xs text-gray-400 hover:text-black transition">
+        View profile →
+      </a>
+    </div>
+
+    <!-- Product context -->
+    {% if product %}
+    <div class="flex items-center gap-4 p-4 rounded-xl border border-gray-100 mb-8">
+      <img src="{{ product.image_url }}" class="w-16 h-16 object-contain rounded-lg bg-gray-50 border border-gray-100 p-1">
+      <div>
+        <p class="text-xs text-gray-400 uppercase tracking-widest mb-0.5">Regarding</p>
+        <p class="font-medium text-sm">{{ product.name }}</p>
+        <p class="text-primary font-semibold text-sm">{{ money_fmt(product.currency, product.price_minor) }}</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Message form -->
+    <form method="post" action="/messages/send">
+      <input type="hidden" name="recipient_id" value="{{ seller.id }}">
+      {% if product %}
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+      {% endif %}
+
+      <label class="block text-sm font-medium text-gray-700 mb-2">Your message</label>
+      <textarea
+        name="body"
+        rows="6"
+        placeholder="Hi, I'm interested in this product and wanted to ask..."
+        required
+        class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black resize-none mb-4"
+      ></textarea>
+
+      <button type="submit"
+        class="w-full h-11 bg-primary text-white rounded-xl font-medium hover:bg-red-600 transition text-sm">
+        Send Message
+      </button>
+    </form>
+
+  </div>
+</main>
+{% endblock %}

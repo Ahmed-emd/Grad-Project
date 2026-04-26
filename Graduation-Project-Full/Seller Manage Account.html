@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - Listables</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#DB4444',
+                        secondary: '#F5F5F5',
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="font-sans antialiased text-gray-900 bg-white min-h-screen flex flex-col">
+
+    <!-- Global Top Header -->
+    <header class="border-b border-gray-200 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-[88px]">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="index.html" class="text-2xl font-bold tracking-tight text-black">Listables</a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index.html"
+                        class="text-gray-900 font-medium hover:text-black border-b-2 border-transparent hover:border-gray-400 transition pb-1">Home</a>
+                    <a href="#"
+                        class="text-gray-900 font-medium hover:text-black border-b-2 border-transparent hover:border-gray-400 transition pb-1">Contact</a>
+                    <a href="#"
+                        class="text-gray-900 font-medium hover:text-black border-b-2 border-transparent hover:border-gray-400 transition pb-1">About</a>
+                </nav>
+
+                <!-- Right Utility Actions -->
+                <div class="flex items-center space-x-6">
+                    <!-- Search Input -->
+                    <div class="relative hidden sm:block">
+                        <input type="text" placeholder="What are you looking for?"
+                            class="bg-secondary text-sm px-4 py-2 w-64 rounded focus:outline-none focus:ring-1 focus:ring-gray-300">
+                        <button class="absolute right-3 top-2.5 text-black">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Icons -->
+                    <div class="flex items-center space-x-4">
+                        <a href="wishlist.html" class="text-black hover:text-gray-600 transition">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                </path>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-black hover:text-gray-600 transition">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z">
+                                </path>
+                            </svg>
+                        </a>
+                        <!-- Profile Active state -->
+                        <div class="relative">
+                            <button
+                                class="flex items-center text-white bg-primary rounded-full p-1 hover:bg-red-600 transition">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow w-full">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <!-- Breadcrumbs / Welcome -->
+            <div class="flex justify-between items-center text-sm mb-12">
+                <div class="text-gray-500">
+                    <a href="index.html" class="hover:text-black">Home</a> <span class="mx-2">/</span> <span
+                        class="text-black font-medium">My Account</span>
+                </div>
+                <div>
+                    Welcome! <span class="text-primary font-medium">Md Rimel</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Sidebar -->
+                <aside class="space-y-6">
+                    <div>
+                        <h3 class="font-medium text-lg mb-4">Manage My Account</h3>
+                        <ul class="space-y-3 pl-4 text-gray-500">
+                            <li><a href="my-account.html" class="text-primary font-medium">My Profile</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-medium text-lg mb-4">My Listings</h3>
+                        <ul class="space-y-3 pl-4 text-gray-500">
+                            <li><a href="#" class="hover:text-black">Create Listing</a></li>
+                        </ul>
+                    </div>
+                </aside>
+
+                <!-- Main Content -->
+                <div class="lg:col-span-3">
+                    <div
+                        class="bg-white rounded p-8 sm:p-10 shadow-[0_4px_30px_rgba(0,0,0,0.03)] border-2 border-gray-50 max-w-4xl mx-auto">
+                        <h2 class="text-xl font-medium text-primary mb-8">Edit Your Profile</h2>
+
+                        <form action="#" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <label class="text-sm">First Name</label>
+                                    <input type="text" value="Md"
+                                        class="w-full bg-secondary text-gray-900 rounded px-4 py-3 focus:outline-none focus:ring-1 focus:ring-gray-300">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm">Last Name</label>
+                                    <input type="text" value="Rimel"
+                                        class="w-full bg-secondary text-gray-900 rounded px-4 py-3 focus:outline-none focus:ring-1 focus:ring-gray-300">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <label class="text-sm">Email</label>
+                                    <input type="email" value="rimel1111@gmail.com"
+                                        class="w-full bg-secondary text-gray-900 rounded px-4 py-3 focus:outline-none focus:ring-1 focus:ring-gray-300">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-sm">Address</label>
+                                    <input type="text" value="Kingston, 5236, United State"
+                                        class="w-full bg-secondary text-gray-900 rounded px-4 py-3 focus:outline-none focus:ring-1 focus:ring-gray-300">
+                                </div>
+                            </div>
+
+                            <div class="pt-4 space-y-4">
+                                <label class="text-sm text-gray-900">Password Changes</label>
+                                <input type="password" placeholder="Current Password"
+                                    class="w-full bg-secondary text-gray-900 rounded px-4 py-3 focus:outline-none focus:ring-1 focus:ring-gray-300">
+                                <input type="password" placeholder="New Password"
+                                    class="w-full bg-secondary text-gray-900 rounded px-4 py-3 focus:outline-none focus:ring-1 focus:ring-gray-300">
+                                <input type="password" placeholder="Confirm New Password"
+                                    class="w-full bg-secondary text-gray-900 rounded px-4 py-3 focus:outline-none focus:ring-1 focus:ring-gray-300">
+                            </div>
+
+                            <div class="flex justify-end space-x-6 pt-6">
+                                <button type="button"
+                                    class="text-gray-900 font-medium hover:text-gray-600 transition">Cancel</button>
+                                <button type="submit"
+                                    class="bg-primary text-white font-medium px-8 py-3 rounded hover:bg-red-600 transition">Save
+                                    Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="bg-black text-white pt-20 pb-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-16">
+                <!-- Column 1 -->
+                <div class="space-y-4">
+                    <h3 class="text-2xl font-bold mb-6">Exclusive</h3>
+                    <h4 class="text-lg font-medium">Subscribe</h4>
+                    <p class="text-[15px] font-light text-gray-200">Get 10% off your first order</p>
+                    <div class="relative mt-2">
+                        <input type="email" placeholder="Enter your email"
+                            class="bg-transparent border-1.5 border-white rounded px-4 py-3 w-full text-sm placeholder-gray-400 focus:outline-none">
+                        <button class="absolute right-4 top-3.5 text-white">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <!-- Column 2 -->
+                <div class="space-y-4">
+                    <h3 class="text-xl font-medium mb-6">Support</h3>
+                    <div class="space-y-4 text-[15px] font-light text-gray-200">
+                        <p>listables@gmail.com</p>
+                    </div>
+                </div>
+                <!-- Column 3 -->
+                <div class="space-y-4">
+                    <h3 class="text-xl font-medium mb-6">Account</h3>
+                    <ul class="space-y-4 text-[15px] font-light text-gray-200">
+                        <li><a href="#" class="hover:text-white transition">My Account</a></li>
+                        <li><a href="#" class="hover:text-white transition">Sign up as a seller</a></li>
+                        <li><a href="#" class="hover:text-white transition">Wishlist</a></li>
+                    </ul>
+                </div>
+                <!-- Column 4 -->
+                <div class="space-y-4">
+                    <h3 class="text-xl font-medium mb-6">Quick Link</h3>
+                    <ul class="space-y-4 text-[15px] font-light text-gray-200">
+                        <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition">Terms Of Use</a></li>
+                        <li><a href="#" class="hover:text-white transition">FAQ</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact</a></li>
+                    </ul>
+                </div>
+                <!-- Column 5 -->
+                <div class="space-y-4">
+                    <h3 class="text-xl font-medium mb-6">Download App</h3>
+                    <p class="text-xs font-light text-gray-400">Save $3 with App New User Only</p>
+                    <div class="flex items-center space-x-3 mt-2">
+                        <div class="w-[80px] h-[80px] bg-white p-1 rounded-sm">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=listables"
+                                alt="QR Code" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <a href="#" class="w-[104px]"><img
+                                    src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg"
+                                    alt="Google Play"></a>
+                            <a href="#" class="w-[104px]"><img
+                                    src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg"
+                                    alt="App Store"></a>
+                        </div>
+                    </div>
+                    <div class="flex space-x-6 pt-4">
+                        <a href="#" class="text-white hover:text-gray-300 transition"><svg class="w-5 h-5"
+                                fill="currentColor" viewBox="0 0 24 24">
+                                <path d="..." />
+                            </svg></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-[#141414] pt-6 flex justify-center text-[15px] text-[#3D3D3D]">
+                <p>&copy; Copyright Listables 2025. All right reserved</p>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

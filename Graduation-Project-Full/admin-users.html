@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Listables</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF6B6B',
+                        secondary: '#F5F5F5',
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-sidebar {
+            background-color: #FF5A5F;
+        }
+
+        .admin-sidebar-active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased text-gray-900 bg-secondary min-h-screen flex">
+
+    <!-- Admin Sidebar -->
+    <aside class="w-64 admin-sidebar text-white flex flex-col fixed h-full z-10 transition-transform">
+        <div class="h-[88px] flex items-center px-8 bg-white text-black mb-8 border-r border-gray-200">
+            <a href="#" class="text-xl font-bold tracking-tight">Listables <span
+                    class="text-xs font-normal ml-1">Admin</span></a>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-2">
+            <a href="admin-dashboard.html"
+                class="flex items-center px-4 py-3 text-white hover:bg-white/10 rounded-md font-medium transition">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                    </path>
+                </svg>
+                Dashboard
+            </a>
+
+            <!-- Active link -->
+            <a href="admin-users.html"
+                class="flex items-center px-4 py-3 admin-sidebar-active rounded-md text-white font-medium transition">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z">
+                    </path>
+                </svg>
+                Users
+            </a>
+
+            <a href="admin-listings.html"
+                class="flex items-center px-4 py-3 text-white hover:bg-white/10 rounded-md font-medium transition">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                </svg>
+                Listings
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 ml-64 p-8">
+        <h1 class="text-3xl font-bold text-black mb-6 mt-[64px] pl-4">User Management</h1>
+
+        <div class="px-4">
+            <div class="bg-black text-white rounded-xl pt-8 px-8 pb-32 min-h-[600px]">
+
+                <!-- Tabs -->
+                <div class="flex space-x-8 mb-8">
+                    <button class="text-primary font-bold text-sm tracking-wide">All Users (25000)</button>
+                    <button class="text-white hover:text-gray-300 font-bold text-sm tracking-wide transition">Sellers
+                        (3000)</button>
+                    <button class="text-white hover:text-gray-300 font-bold text-sm tracking-wide transition">Buyers
+                        (21500)</button>
+                    <button class="text-white hover:text-gray-300 font-bold text-sm tracking-wide transition">Banned
+                        (500)</button>
+                </div>
+
+                <!-- Users Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-gray-700 text-sm font-semibold">
+                                <th class="pb-3 pt-2 font-bold w-1/4">User</th>
+                                <th class="pb-3 pt-2 font-bold w-[15%] text-center">Role</th>
+                                <th class="pb-3 pt-2 font-bold w-[15%] text-center">Status</th>
+                                <th class="pb-3 pt-2 font-bold w-[20%] text-center">Join Date</th>
+                                <th class="pb-3 pt-2 font-bold w-[10%] text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm font-light">
+                            <tr class="border-b border-gray-800 hover:bg-gray-900/50 transition">
+                                <td class="py-4">Ahmed88</td>
+                                <td class="py-4 text-center">Seller</td>
+                                <td class="py-4 text-center">Verified</td>
+                                <td class="py-4 text-center">13/10/2025</td>
+                                <td class="py-4 text-center">...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+
+</html>

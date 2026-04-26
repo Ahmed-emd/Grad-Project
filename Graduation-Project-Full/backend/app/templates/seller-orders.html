@@ -1,0 +1,131 @@
+{% extends "_layout.html" %}
+{% block content %}
+<main class="flex-grow w-full pb-20 pt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <div class="flex items-center space-x-4 text-primary font-semibold mb-2">
+          <span class="w-5 h-10 bg-primary rounded-sm"></span>
+          <span>Seller Dashboard</span>
+        </div>
+        <h1 class="text-3xl font-bold tracking-tight">My Sales</h1>
+        <p class="text-gray-500 text-sm mt-1">Orders containing your products. Confirm dispatch once shipped.</p>
+      </div>
+      <a href="/my-listings.html"
+        class="border border-gray-300 text-sm px-5 py-2.5 rounded hover:bg-gray-50 transition font-medium">
+        My Listings
+      </a>
+    </div>
+
+    {% if orders_data|length == 0 %}
+    <div class="bg-gray-50 border border-gray-200 rounded-xl px-6 py-16 text-center">
+      <p class="text-gray-500 text-sm">No sales yet. Once a buyer purchases your product it will appear here.</p>
+    </div>
+
+    {% else %}
+    <div class="space-y-4">
+      {% for row in orders_data %}
+      {% set o = row.order %}
+      <div class="border border-gray-200 rounded-xl p-6
+        {% if o.status == 'completed' %}bg-green-50 border-green-200
+        {% elif o.status == 'cancelled' %}bg-red-50 border-red-200
+        {% else %}bg-white{% endif %}">
+
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+
+          <!-- Order info -->
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="font-bold text-lg">Order #{{ o.id }}</span>
+              {% if o.status == 'completed' %}
+                <span class="bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-1 rounded-full">Completed</span>
+              {% elif o.status == 'cancelled' %}
+                <span class="bg-red-100 text-red-600 text-xs font-semibold px-2.5 py-1 rounded-full">Cancelled</span>
+              {% elif o.status == 'paid' %}
+                <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full">Paid — Awaiting Dispatch</span>
+              {% else %}
+                <span class="bg-yellow-100 text-yellow-700 text-xs font-semibold px-2.5 py-1 rounded-full">{{ o.status | capitalize }}</span>
+              {% endif %}
+            </div>
+
+            <div class="text-sm text-gray-500 space-y-1">
+              <p>Total: <span class="font-medium text-gray-800">{{ money_fmt(o.currency, o.total_minor) }}</span></p>
+              <p>Buyer: <span class="font-medium text-gray-800">{{ o.customer_first_name }} {{ o.customer_last_name }}</span></p>
+              <p>Ship to: <span class="font-medium text-gray-800">{{ o.address_line1 }}{% if o.address_line2 %}, {{ o.address_line2 }}{% endif %}, {{ o.city }}</span></p>
+              <p>Phone: <span class="font-medium text-gray-800">{{ o.customer_phone }}</span></p>
+              <p>Placed: <span class="font-medium text-gray-800">{{ o.created_at.strftime("%d %b %Y %H:%M") if o.created_at else '—' }}</span></p>
+            </div>
+
+            <!-- Items -->
+            <div class="mt-4 space-y-2">
+              {% for item in o.items %}
+              <div class="flex items-center gap-3 bg-gray-50 rounded-lg p-3 border border-gray-100">
+                <img src="{{ item.image_url }}" class="w-10 h-10 object-cover rounded border border-gray-200"
+                  onerror="this.style.display='none'">
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium truncate">{{ item.product_name }}</p>
+                  <p class="text-xs text-gray-400">Qty: {{ item.qty }}</p>
+                </div>
+                <p class="text-sm font-semibold text-primary">{{ money_fmt(o.currency, item.line_total_minor) }}</p>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Confirmation panel -->
+          <div class="md:w-64 flex-shrink-0">
+            <div class="rounded-xl border border-gray-200 p-4 bg-white space-y-3">
+              <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Escrow Status</p>
+
+              <!-- Seller confirmation -->
+              <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-500">Your confirmation</span>
+                {% if row.seller_confirmed %}
+                  <span class="text-green-600 font-semibold text-xs">✓ Done</span>
+                {% else %}
+                  <span class="text-yellow-500 font-semibold text-xs">Pending</span>
+                {% endif %}
+              </div>
+
+              <!-- Buyer confirmation -->
+              <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-500">Buyer confirmation</span>
+                {% if row.buyer_confirmed %}
+                  <span class="text-green-600 font-semibold text-xs">✓ Done</span>
+                {% else %}
+                  <span class="text-yellow-500 font-semibold text-xs">Pending</span>
+                {% endif %}
+              </div>
+
+              {% if o.status not in ['completed', 'cancelled'] %}
+                {% if not row.seller_confirmed %}
+                <a href="/order/{{ o.id }}/confirm"
+                  class="block w-full text-center bg-primary text-white text-sm font-medium py-2.5 rounded-lg hover:bg-red-600 transition mt-2">
+                  Confirm & Upload Proof
+                </a>
+                {% else %}
+                <div class="mt-2 text-center text-xs text-green-600 font-medium py-2">
+                  ✓ You confirmed dispatch
+                </div>
+                {% endif %}
+                {% if row.seller_confirmed and row.buyer_confirmed %}
+                <p class="text-xs text-center text-gray-400 mt-1">Both confirmed — awaiting admin to release payment.</p>
+                {% endif %}
+              {% endif %}
+
+              {% if o.status == 'completed' %}
+              <p class="text-xs text-center text-green-600 font-semibold mt-2">✓ Payment released to you</p>
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+  </div>
+</main>
+{% endblock %}

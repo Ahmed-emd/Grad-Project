@@ -1,0 +1,175 @@
+{% extends "_layout.html" %}
+{% block content %}
+
+{# ── Parse description into main body + extra details dict ── #}
+{% set ns = namespace(main_desc=product.description, extras={}) %}
+{% if "— Additional details —" in product.description %}
+  {% set parts = product.description.split("— Additional details —") %}
+  {% set ns.main_desc = parts[0].strip() %}
+  {% set extras_raw = parts[1].strip() %}
+  {% for line in extras_raw.split("\n") %}
+    {% if ":" in line %}
+      {% set kv = line.split(":", 1) %}
+      {% set _ = ns.extras.update({ kv[0].strip(): kv[1].strip() }) %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{# ── Category icon map ── #}
+{% set cat = product.category | lower %}
+
+<main class="flex-grow w-full">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+    <!-- Breadcrumb -->
+    <div class="text-sm text-gray-500 mb-10">
+      <a href="/index.html" class="hover:text-black transition">Home</a>
+      <span class="mx-2">/</span>
+      <a href="/category/{{ product.category }}" class="hover:text-black transition">{{ product.category }}</a>
+      <span class="mx-2">/</span>
+      <span class="text-black font-medium">{{ product.name }}</span>
+    </div>
+
+    <!-- Main grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-20">
+
+      <!-- Image -->
+      <div class="bg-gray-50 rounded-2xl flex items-center justify-center p-10 min-h-[420px] border border-gray-100">
+        <img src="{{ product.image_url }}" alt="{{ product.name }}"
+          class="max-w-full max-h-[480px] object-contain mix-blend-multiply drop-shadow-sm">
+      </div>
+
+      <!-- Info panel -->
+      <div class="flex flex-col">
+
+        <!-- Category badge -->
+        <span class="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
+          {% if "electron" in cat %}
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          {% elif "gaming" in cat or "game" in cat %}
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/></svg>
+          {% elif "home" in cat or "furni" in cat %}
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline stroke-linecap="round" stroke-linejoin="round" stroke-width="2" points="9 22 9 12 15 12 15 22"/></svg>
+          {% elif "fashion" in cat or "cloth" in cat %}
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/></svg>
+          {% elif "sport" in cat %}
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+          {% else %}
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
+          {% endif %}
+          {{ product.category }}
+        </span>
+
+        <h1 class="text-2xl font-semibold tracking-tight mb-2 leading-snug">{{ product.name }}</h1>
+        <div class="text-3xl font-bold text-primary mb-5">{{ money_fmt(product.currency, product.price_minor) }}</div>
+
+        <!-- Stock indicator -->
+        {% if product.stock_qty > 10 %}
+          <p class="text-xs text-green-600 font-medium mb-5">✓ In stock</p>
+        {% elif product.stock_qty > 0 %}
+          <p class="text-xs text-amber-500 font-medium mb-5">⚠ Only {{ product.stock_qty }} left</p>
+        {% else %}
+          <p class="text-xs text-red-500 font-medium mb-5">✕ Out of stock</p>
+        {% endif %}
+
+        <!-- Description -->
+        <p class="text-[15px] font-light text-gray-600 mb-8 leading-relaxed">{{ ns.main_desc }}</p>
+
+        <!-- ── Category-specific details grid ── -->
+        {% if ns.extras %}
+        <div class="mb-8">
+          <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Product details</h2>
+          <div class="rounded-xl border border-gray-100 overflow-hidden divide-y divide-gray-100">
+            {% for key, val in ns.extras.items() %}
+            <div class="flex items-center px-4 py-3 hover:bg-gray-50 transition-colors">
+              <span class="text-xs font-medium text-gray-400 w-36 shrink-0">{{ key }}</span>
+              <span class="text-sm text-gray-800 font-medium">
+                {# Condition pill #}
+                {% if key | lower == "condition" %}
+                  {% if "new" in val | lower %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">{{ val }}</span>
+                  {% elif "like new" in val | lower %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">{{ val }}</span>
+                  {% elif "good" in val | lower %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">{{ val }}</span>
+                  {% else %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">{{ val }}</span>
+                  {% endif %}
+                {# Platform pill for gaming #}
+                {% elif key | lower == "platform" %}
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1H7a1 1 0 000 2h1v1a1 1 0 002 0V6h1a1 1 0 000-2h-1V3z"/><path fill-rule="evenodd" d="M5 9a7 7 0 1114 0A7 7 0 015 9zm7-5a5 5 0 100 10A5 5 0 0012 4z" clip-rule="evenodd"/></svg>
+                    {{ val }}
+                  </span>
+                {# Gender pill #}
+                {% elif key | lower == "gender" %}
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-pink-100 text-pink-700">{{ val }}</span>
+                {# Size badge #}
+                {% elif key | lower == "size" %}
+                  <span class="inline-flex items-center px-3 py-0.5 rounded border border-gray-300 text-xs font-bold text-gray-700 bg-white tracking-widest">{{ val }}</span>
+                {# Assembly #}
+                {% elif key | lower == "assembly required" %}
+                  {% if val | lower == "yes" %}
+                    <span class="text-amber-600">🔧 {{ val }}</span>
+                  {% else %}
+                    <span class="text-green-600">✓ {{ val }}</span>
+                  {% endif %}
+                {# Age rating #}
+                {% elif key | lower == "age rating" %}
+                  <span class="inline-flex items-center px-2 py-0.5 rounded border-2 border-gray-700 text-xs font-black text-gray-700">{{ val }}</span>
+                {# Default plain text #}
+                {% else %}
+                  {{ val }}
+                {% endif %}
+              </span>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Add to cart -->
+        <div class="flex items-center gap-3 mt-auto">
+          <form method="post" action="/cart/add" class="flex items-center gap-3 w-full">
+            <input type="hidden" name="product_id" value="{{ product.id }}">
+            <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden h-11 w-28 shrink-0">
+              <input name="qty" type="number" value="1" min="1" max="{{ product.stock_qty }}"
+                class="px-3 py-2 w-full text-center text-sm focus:outline-none">
+            </div>
+            <button type="submit" {% if product.stock_qty == 0 %}disabled{% endif %}
+              class="h-11 flex-1 bg-primary text-white rounded-lg font-medium hover:bg-red-600 transition disabled:opacity-40 disabled:cursor-not-allowed">
+              Add to cart
+            </button>
+          </form>
+          <a href="/cart.html"
+            class="h-11 px-5 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition inline-flex items-center text-sm whitespace-nowrap">
+            View cart
+          </a>
+        </div>
+        <!-- Seller actions -->
+        {% if product.seller_id %}
+        <div class="flex items-center gap-3 mt-4 pt-4 border-t border-gray-100">
+          <a href="/messages/compose?seller_id={{ product.seller_id }}&product_id={{ product.id }}"
+            class="h-10 flex-1 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition inline-flex items-center justify-center gap-2 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+            Message Seller
+          </a>
+          <a href="/seller/{{ product.seller_id }}"
+            class="h-10 flex-1 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition inline-flex items-center justify-center gap-2 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            About Seller
+          </a>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

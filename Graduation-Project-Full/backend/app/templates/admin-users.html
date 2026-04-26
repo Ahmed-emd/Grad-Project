@@ -1,0 +1,299 @@
+{% extends "_admin_layout.html" %}
+{% set active_page = 'users' %}
+{% block content %}
+<div class="p-8">
+
+  <div class="mb-8">
+    <div class="font-mono text-accent text-xs tracking-widest uppercase mb-2">Admin / Users</div>
+    <h1 class="font-display text-3xl font-bold text-bright">Users</h1>
+    <p class="text-muted text-sm mt-1 font-mono">{{ users | length }} registered accounts</p>
+  </div>
+
+  <div class="grid grid-cols-4 gap-4 mb-8">
+    {% set buyer_count = users | rejectattr('is_admin') | rejectattr('is_seller') | list | length %}
+    {% set seller_count = users | selectattr('is_seller') | rejectattr('is_admin') | list | length %}
+    {% set admin_count = users | selectattr('is_admin') | list | length %}
+    <div class="stat-card rounded-xl p-5">
+      <div class="text-muted font-mono text-xs uppercase tracking-wider mb-3">Total</div>
+      <div class="text-3xl font-bold text-bright font-display">{{ users | length }}</div>
+    </div>
+    <div class="stat-card rounded-xl p-5">
+      <div class="text-muted font-mono text-xs uppercase tracking-wider mb-3">Buyers</div>
+      <div class="text-3xl font-bold text-bright font-display">{{ buyer_count }}</div>
+    </div>
+    <div class="stat-card rounded-xl p-5">
+      <div class="text-muted font-mono text-xs uppercase tracking-wider mb-3">Sellers</div>
+      <div class="text-3xl font-bold text-accent font-display">{{ seller_count }}</div>
+    </div>
+    <div class="stat-card rounded-xl p-5">
+      <div class="text-muted font-mono text-xs uppercase tracking-wider mb-3">Admins</div>
+      <div class="text-3xl font-bold text-yellow-400 font-display">{{ admin_count }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card rounded-xl overflow-hidden">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-border">
+          <th class="text-left px-5 py-4 font-mono text-xs text-muted uppercase tracking-wider">ID</th>
+          <th class="text-left px-5 py-4 font-mono text-xs text-muted uppercase tracking-wider">Email</th>
+          <th class="text-left px-5 py-4 font-mono text-xs text-muted uppercase tracking-wider">Role</th>
+          <th class="text-left px-5 py-4 font-mono text-xs text-muted uppercase tracking-wider">Orders</th>
+          <th class="text-left px-5 py-4 font-mono text-xs text-muted uppercase tracking-wider">Sales</th>
+          <th class="text-left px-5 py-4 font-mono text-xs text-muted uppercase tracking-wider">Joined</th>
+          <th class="text-left px-5 py-4 font-mono text-xs text-muted uppercase tracking-wider">History</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-border">
+        {% for u in users %}
+        <tr class="hover:bg-dim transition-colors">
+          <td class="px-5 py-4 font-mono text-xs text-muted">{{ u.id }}</td>
+          <td class="px-5 py-4 text-bright font-medium">{{ u.email }}</td>
+          <td class="px-5 py-4">
+            {% if u.is_admin %}
+              <span class="badge-pending font-mono text-xs px-2.5 py-1 rounded-md font-semibold">admin</span>
+            {% elif u.is_seller %}
+              <span class="badge-live font-mono text-xs px-2.5 py-1 rounded-md font-semibold">seller</span>
+            {% else %}
+              <span class="badge-unidentified font-mono text-xs px-2.5 py-1 rounded-md font-semibold">buyer</span>
+            {% endif %}
+          </td>
+          <td class="px-5 py-4 font-mono text-xs text-muted">{{ u.orders | length }}</td>
+          <td class="px-5 py-4 font-mono text-xs">
+            {% if u.is_seller %}
+              {% set sales = seller_sales.get(u.id, 0) %}
+              <button onclick="openSellerSales({{ u.id }}, '{{ u.email|e }}')"
+                class="text-accent hover:underline">
+                {{ sales }} item{{ 's' if sales != 1 else '' }} sold
+              </button>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td class="px-5 py-4 font-mono text-xs text-muted">{{ u.created_at.strftime('%Y-%m-%d') if u.created_at else '—' }}</td>
+          <td class="px-5 py-4">
+            {% if u.orders %}
+            <button onclick="openUserOrders({{ u.id }}, '{{ u.email|e }}')" class="font-mono text-xs text-accent hover:underline">
+              View {{ u.orders | length }} order{{ 's' if u.orders | length != 1 else '' }}
+            </button>
+            {% else %}
+            <span class="font-mono text-xs text-muted">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- User Orders Modal -->
+<div id="userOrdersModal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeUserOrders()"></div>
+  <div class="absolute right-0 top-0 h-full w-full max-w-md bg-surface border-l border-border flex flex-col overflow-y-auto">
+    <div class="flex items-center justify-between px-6 py-5 border-b border-border">
+      <div>
+        <h2 class="font-display text-lg font-bold text-bright">Order History</h2>
+        <p class="font-mono text-xs text-muted" id="modal-user-email"></p>
+      </div>
+      <button onclick="closeUserOrders()" class="text-muted hover:text-bright transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="px-6 py-5 flex-1" id="modal-user-orders"></div>
+  </div>
+</div>
+
+<!-- Seller Sales Modal -->
+<div id="sellerSalesModal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeSellerSales()"></div>
+  <div class="absolute right-0 top-0 h-full w-full max-w-lg bg-surface border-l border-border flex flex-col overflow-y-auto">
+    <div class="flex items-center justify-between px-6 py-5 border-b border-border">
+      <div>
+        <h2 class="font-display text-lg font-bold text-bright">Seller Sales</h2>
+        <p class="font-mono text-xs text-muted" id="modal-seller-email"></p>
+      </div>
+      <button onclick="closeSellerSales()" class="text-muted hover:text-bright transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="px-6 py-5 flex-1" id="modal-seller-sales"></div>
+  </div>
+</div>
+
+<script>
+  const allUsersData = {
+    {% for u in users %}
+    {{ u.id }}: {
+      email: "{{ u.email|e }}",
+      orders: [
+        {% for o in u.orders %}
+        {
+          id: {{ o.id }},
+          total: "{{ money_fmt(o.currency, o.total_minor)|e }}",
+          status: "{{ o.status }}",
+          date: "{{ o.created_at.strftime('%Y-%m-%d') if o.created_at else '' }}",
+          items: {{ o.items | length }},
+        },
+        {% endfor %}
+      ]
+    },
+    {% endfor %}
+  };
+
+  const allSellerData = {
+    {% for u in users %}
+    {% if u.is_seller %}
+    {{ u.id }}: {
+      email: "{{ u.email|e }}",
+      shop_name: "{{ u.seller_profile.shop_name|e if u.seller_profile and u.seller_profile.shop_name else u.email|e }}",
+      orders: [
+        {% for o in seller_orders_map.get(u.id, []) %}
+        {
+          id: {{ o.id }},
+          total: "{{ money_fmt(o.currency, o.total_minor)|e }}",
+          status: "{{ o.status }}",
+          date: "{{ o.created_at.strftime('%Y-%m-%d') if o.created_at else '' }}",
+          customer: "{{ o.customer_first_name|e }}",
+          customer_email: "{{ o.customer_email|e }}",
+          city: "{{ o.city|e }}",
+          items: [
+            {% for item in o.items %}
+            {
+              name: "{{ item.product_name|e }}",
+              qty: {{ item.qty }},
+              total: "{{ money_fmt(o.currency, item.line_total_minor)|e }}",
+              image: "{{ item.image_url|e }}",
+            },
+            {% endfor %}
+          ],
+        },
+        {% endfor %}
+      ]
+    },
+    {% endif %}
+    {% endfor %}
+  };
+
+  function openUserOrders(userId, email) {
+    const data = allUsersData[userId];
+    document.getElementById('modal-user-email').textContent = email;
+    const container = document.getElementById('modal-user-orders');
+    if (!data || data.orders.length === 0) {
+      container.innerHTML = '<p class="font-mono text-xs text-muted">No orders found.</p>';
+    } else {
+      container.innerHTML = data.orders.map(o => {
+        let badgeClass = 'badge-unidentified';
+        if (o.status === 'paid') badgeClass = 'badge-paid';
+        else if (o.status === 'pending') badgeClass = 'badge-pending';
+        else if (o.status === 'completed') badgeClass = 'bg-green-900/40 text-green-400';
+        else if (o.status === 'cancelled') badgeClass = 'bg-red-900/40 text-red-400';
+        return `
+          <div class="stat-card rounded-lg p-4 mb-3">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-mono text-accent font-semibold text-sm">#${o.id}</span>
+              <span class="${badgeClass} font-mono text-xs px-2 py-0.5 rounded-md font-semibold">${o.status}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-muted font-mono text-xs">${o.items} item${o.items !== 1 ? 's' : ''} · ${o.date}</span>
+              <span class="font-mono text-bright font-semibold text-xs">${o.total}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    document.getElementById('userOrdersModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeUserOrders() {
+    document.getElementById('userOrdersModal').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  function openSellerSales(sellerId, email) {
+    const data = allSellerData[sellerId];
+    document.getElementById('modal-seller-email').textContent = data ? data.shop_name : email;
+    const container = document.getElementById('modal-seller-sales');
+
+    if (!data || data.orders.length === 0) {
+      container.innerHTML = '<p class="font-mono text-xs text-muted">No sales yet.</p>';
+    } else {
+      const completed = data.orders.filter(o => o.status === 'completed').length;
+      const pending = data.orders.filter(o => o.status === 'pending').length;
+      const cancelled = data.orders.filter(o => o.status === 'cancelled').length;
+
+      container.innerHTML = `
+        <div class="grid grid-cols-3 gap-3 mb-6">
+          <div class="stat-card rounded-lg p-3 text-center">
+            <div class="text-muted font-mono text-[10px] uppercase mb-1">Orders</div>
+            <div class="text-bright font-bold text-lg">${data.orders.length}</div>
+          </div>
+          <div class="stat-card rounded-lg p-3 text-center">
+            <div class="text-muted font-mono text-[10px] uppercase mb-1">Completed</div>
+            <div class="text-green-400 font-bold text-lg">${completed}</div>
+          </div>
+          <div class="stat-card rounded-lg p-3 text-center">
+            <div class="text-muted font-mono text-[10px] uppercase mb-1">Pending</div>
+            <div class="text-yellow-400 font-bold text-lg">${pending}</div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between mb-4">
+          <span class="font-mono text-xs text-muted uppercase tracking-wider">Order History</span>
+          <a href="/seller/${sellerId}" target="_blank" class="font-mono text-xs text-accent hover:underline">View shop →</a>
+        </div>
+
+        ${data.orders.map(o => {
+          let badgeClass = 'badge-unidentified';
+          if (o.status === 'paid') badgeClass = 'badge-paid';
+          else if (o.status === 'pending') badgeClass = 'badge-pending';
+          else if (o.status === 'completed') badgeClass = 'bg-green-900/40 text-green-400';
+          else if (o.status === 'cancelled') badgeClass = 'bg-red-900/40 text-red-400';
+
+          const itemsHtml = o.items.map(item => `
+            <div class="flex items-center gap-3 py-2 border-t border-border">
+              ${item.image ? `<img src="${item.image}" class="w-8 h-8 rounded object-cover bg-dim flex-shrink-0">` : ''}
+              <div class="flex-1 min-w-0">
+                <p class="font-mono text-xs text-bright truncate">${item.name}</p>
+                <p class="font-mono text-[10px] text-muted">× ${item.qty}</p>
+              </div>
+              <span class="font-mono text-xs text-accent">${item.total}</span>
+            </div>
+          `).join('');
+
+          return `
+            <div class="stat-card rounded-lg p-4 mb-3">
+              <div class="flex items-center justify-between mb-3">
+                <span class="font-mono text-accent font-semibold text-sm">#${o.id}</span>
+                <span class="${badgeClass} font-mono text-xs px-2 py-0.5 rounded-md font-semibold">${o.status}</span>
+              </div>
+              <div class="mb-2">
+                <p class="font-mono text-xs text-bright">${o.customer}</p>
+                <p class="font-mono text-[10px] text-muted">${o.customer_email} · ${o.city}</p>
+                <p class="font-mono text-[10px] text-muted">${o.date}</p>
+              </div>
+              ${itemsHtml}
+              <div class="flex justify-end mt-2 pt-2 border-t border-border">
+                <span class="font-mono text-xs text-bright font-semibold">${o.total}</span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      `;
+    }
+
+    document.getElementById('sellerSalesModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSellerSales() {
+    document.getElementById('sellerSalesModal').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+</script>
+{% endblock %}

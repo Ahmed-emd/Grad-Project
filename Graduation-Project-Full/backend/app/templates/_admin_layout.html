@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            accent: '#FF4444',
+            dim: '#0a0a0f',
+            surface: '#111118',
+            card: '#18181f',
+            border: '#2a2a35',
+            muted: '#6b6b80',
+            bright: '#e8e8f0',
+          },
+          fontFamily: {
+            display: ['Syne', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #0a0a0f; }
+    .sidebar-link { transition: all 0.15s ease; }
+    .sidebar-link:hover { background: #18181f; color: #e8e8f0; }
+    .sidebar-link.active { background: #FF4444; color: #fff; }
+    .sidebar-link.active svg { color: #fff; }
+    .stat-card { background: #18181f; border: 1px solid #2a2a35; transition: border-color 0.2s; }
+    .stat-card:hover { border-color: #FF4444; }
+    .badge-pending { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+    .badge-live { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+    .badge-rejected { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+    .badge-paid { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+    .badge-unidentified { background: rgba(107,107,128,0.15); color: #6b6b80; border: 1px solid rgba(107,107,128,0.3); }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0a0a0f; }
+    ::-webkit-scrollbar-thumb { background: #2a2a35; border-radius: 2px; }
+  </style>
+</head>
+<body class="font-display text-bright min-h-screen flex">
+
+  <aside class="w-56 min-h-screen bg-surface border-r border-border flex flex-col fixed top-0 left-0 z-30">
+    <div class="px-6 py-6 border-b border-border">
+      <div class="text-accent font-mono text-xs font-semibold tracking-widest uppercase mb-1">Listables</div>
+      <div class="text-muted font-mono text-[10px] tracking-wider">Admin Console</div>
+    </div>
+
+    <nav class="flex-1 p-3 space-y-1 mt-2">
+      <a href="/admin/dashboard"
+        class="sidebar-link {% if active_page == 'orders' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+        Orders
+      </a>
+      <a href="/admin/validate-listings"
+        class="sidebar-link {% if active_page == 'validate' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        Validate Listings
+      </a>
+      <a href="/admin/users"
+        class="sidebar-link {% if active_page == 'users' %}active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted">
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Users
+      </a>
+    </nav>
+
+    <div class="p-3 border-t border-border">
+      <form method="post" action="/auth/logout">
+        <button type="submit" class="sidebar-link w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          Logout
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <div class="ml-56 flex-1 min-h-screen">
+    {% if flash %}
+    <div class="fixed top-4 right-4 z-50 bg-card border border-border rounded-lg px-4 py-3 text-sm font-mono text-bright shadow-xl">
+      {{ flash }}
+    </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </div>
+
+</body>
+</html>

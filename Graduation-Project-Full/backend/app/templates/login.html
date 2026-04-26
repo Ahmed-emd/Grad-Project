@@ -1,0 +1,20 @@
+{% extends "_layout.html" %}
+{% block content %}
+<main class="flex-grow w-full pb-20 pt-10">
+  <div class="max-w-md mx-auto px-4">
+    <h1 class="text-3xl font-bold tracking-tight mb-8">Login</h1>
+    <form method="post" action="/auth/login" class="space-y-4">
+      <div>
+        <label class="block text-sm text-gray-500 mb-2">Email</label>
+        <input name="email" type="email" required class="bg-secondary rounded w-full px-4 py-3 text-sm">
+      </div>
+      <div>
+        <label class="block text-sm text-gray-500 mb-2">Password</label>
+        <input name="password" type="password" required class="bg-secondary rounded w-full px-4 py-3 text-sm">
+      </div>
+      <button type="submit" class="w-full bg-primary text-white py-3 rounded text-sm font-medium hover:bg-red-600 transition">Login</button>
+    </form>
+    <p class="text-sm text-gray-500 mt-4">No account? <a href="/create-account.html" class="text-black underline">Create one</a></p>
+  </div>
+</main>
+{% endblock %}

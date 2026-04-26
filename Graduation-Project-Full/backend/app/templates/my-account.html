@@ -1,0 +1,121 @@
+{% extends "_layout.html" %}
+{% block content %}
+<main class="flex-grow w-full pb-20 pt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Top bar -->
+    <div class="flex items-center justify-between mb-16">
+      <div class="text-sm font-medium">
+        <a href="/index.html" class="text-gray-400 hover:text-gray-900 transition">Home</a>
+        <span class="text-gray-400 mx-1">/</span>
+        <span class="text-gray-900">My Account</span>
+      </div>
+      {% if current_user %}
+      <div class="text-[15px] font-medium">
+        <span>Welcome! </span>
+        <span class="text-primary">
+          {% if current_user.first_name %}{{ current_user.first_name }}{% else %}{{ current_user.email }}{% endif %}
+        </span>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-8 lg:gap-24">
+
+      <!-- Sidebar -->
+      <div class="w-full md:w-1/4 shrink-0">
+        <div class="mb-6">
+          <h3 class="font-bold mb-4">Manage My Account</h3>
+          <ul class="space-y-3 pl-8">
+            <li><a href="/my-account.html" class="text-primary font-medium hover:text-red-700 transition">My Profile</a></li>
+          </ul>
+        </div>
+        <div class="mb-6">
+          <h3 class="font-bold mb-4">My Orders</h3>
+          <ul class="space-y-3 pl-8">
+            <li><a href="/orders.html" class="text-gray-500 font-medium hover:text-gray-900 transition">My Orders</a></li>
+          </ul>
+        </div>
+        {% if current_user and current_user.is_seller %}
+        <div class="mb-6">
+          <h3 class="font-bold mb-4">Seller</h3>
+          <ul class="space-y-3 pl-8">
+            <li><a href="/my-listings.html" class="text-gray-500 font-medium hover:text-gray-900 transition">My Listings</a></li>
+            <li><a href="/add-listings.html" class="text-gray-500 font-medium hover:text-gray-900 transition">Add Listing</a></li>
+            <li><a href="/seller/{{ current_user.id }}" class="text-gray-500 font-medium hover:text-gray-900 transition">My Shop</a></li>
+          </ul>
+        </div>
+        {% endif %}
+        <div>
+          <h3 class="font-bold">
+            <a href="/wishlist.html" class="hover:text-gray-600 transition">My Wishlist</a>
+          </h3>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="flex-grow bg-white border border-gray-100 shadow-[0_4px_30px_rgba(0,0,0,0.03)] rounded-[4px] py-10 px-10 md:px-16">
+        <h2 class="text-xl font-medium text-primary mb-6">Edit Your Profile</h2>
+
+        <form method="post" action="/account/update" class="space-y-8">
+
+          <!-- Name row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="flex flex-col space-y-2">
+              <label class="text-[15px] font-medium text-black">First Name</label>
+              <input type="text" name="first_name"
+                value="{{ current_user.first_name or '' }}"
+                placeholder="First Name"
+                class="bg-gray-100 rounded py-3 px-4 text-[15px] focus:outline-none focus:ring-1 focus:ring-gray-300">
+            </div>
+            <div class="flex flex-col space-y-2">
+              <label class="text-[15px] font-medium text-black">Last Name</label>
+              <input type="text" name="last_name"
+                value="{{ current_user.last_name or '' }}"
+                placeholder="Last Name"
+                class="bg-gray-100 rounded py-3 px-4 text-[15px] focus:outline-none focus:ring-1 focus:ring-gray-300">
+            </div>
+          </div>
+
+          <!-- Email row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="flex flex-col space-y-2">
+              <label class="text-[15px] font-medium text-black">Email</label>
+              <input type="email" name="email"
+                value="{{ current_user.email or '' }}"
+                placeholder="Email Address"
+                class="bg-gray-100 rounded py-3 px-4 text-[15px] focus:outline-none focus:ring-1 focus:ring-gray-300">
+            </div>
+            <div class="flex flex-col space-y-2">
+              <label class="text-[15px] font-medium text-black">Account Type</label>
+              <div class="bg-gray-100 rounded py-3 px-4 text-[15px] text-gray-500">
+                {% if current_user.is_admin %}Admin{% elif current_user.is_seller %}Seller{% else %}Buyer{% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Password section -->
+          <div class="flex flex-col space-y-4">
+            <label class="text-[15px] font-medium text-black">Password Changes</label>
+            <input type="password" name="current_password" placeholder="Current Password"
+              class="w-full bg-gray-100 rounded py-3 px-4 text-[15px] focus:outline-none focus:ring-1 focus:ring-gray-300">
+            <input type="password" name="new_password" placeholder="New Password"
+              class="w-full bg-gray-100 rounded py-3 px-4 text-[15px] focus:outline-none focus:ring-1 focus:ring-gray-300">
+            <input type="password" name="confirm_password" placeholder="Confirm New Password"
+              class="w-full bg-gray-100 rounded py-3 px-4 text-[15px] focus:outline-none focus:ring-1 focus:ring-gray-300">
+          </div>
+
+          <!-- Actions -->
+          <div class="flex justify-end items-center space-x-8 pt-2">
+            <a href="/index.html" class="text-[15px] font-medium text-black hover:text-gray-600 transition">Cancel</a>
+            <button type="submit"
+              class="bg-primary text-white font-medium rounded px-8 py-3 hover:bg-red-600 transition shadow-sm">
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

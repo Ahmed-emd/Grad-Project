@@ -1,0 +1,49 @@
+{% extends "_layout.html" %}
+{% block content %}
+<main class="flex-grow w-full mb-20 mt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+
+      <!-- Left Image Area -->
+      <div class="w-full lg:w-[60%] bg-[#FDFBF7] rounded flex flex-col justify-center items-center py-20 px-4 min-h-[500px]">
+        <svg width="240" height="240" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M25 40h35l25 100h90l20-75H75" stroke="#253545" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="100" cy="180" r="12" stroke="#253545" stroke-width="12"/>
+          <circle cx="160" cy="180" r="12" stroke="#253545" stroke-width="12"/>
+          <path d="M100 75h55" stroke="#F68C36" stroke-width="10" stroke-linecap="round"/>
+          <path d="M105 100h45" stroke="#F68C36" stroke-width="10" stroke-linecap="round"/>
+          <path d="M110 125h35" stroke="#F68C36" stroke-width="10" stroke-linecap="round"/>
+          <path d="M75 75l10 10 15-15" stroke="#F68C36" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M80 100l10 10 15-15" stroke="#F68C36" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M85 125l10 10 15-15" stroke="#F68C36" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h1 class="text-6xl font-bold tracking-tight text-[#253545] mt-6">Listables</h1>
+      </div>
+
+      <!-- Right Form Area -->
+      <div class="w-full lg:w-[40%] max-w-[400px]">
+        <h2 class="text-3xl font-medium mb-4">Log in to Listables</h2>
+        <p class="text-[15px] mb-10 text-gray-800">Enter your details below</p>
+        <form method="post" action="/auth/login" class="space-y-8">
+          <div>
+            <input name="email" type="email" placeholder="Email" required
+              class="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-red-500 bg-transparent placeholder-gray-500 text-sm transition-colors">
+          </div>
+          <div>
+            <input name="password" type="password" placeholder="Password" required
+              class="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-red-500 bg-transparent placeholder-gray-500 text-sm transition-colors">
+          </div>
+          <div class="pt-2">
+            <button type="submit"
+              class="w-full bg-primary text-white font-medium py-3.5 rounded hover:bg-red-600 transition mb-4">Login</button>
+          </div>
+          <div class="text-center text-[15px] pt-4 text-gray-700">
+            No account? <a href="/create-account.html" class="font-medium text-black hover:underline underline-offset-4 ml-2">Create one</a>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</main>
+{% endblock %}

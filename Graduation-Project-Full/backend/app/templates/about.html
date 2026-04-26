@@ -1,0 +1,87 @@
+{% extends "_layout.html" %}
+{% block content %}
+<main class="flex-grow w-full pb-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-sm text-gray-500">
+        <a href="/index.html" class="hover:text-black">Home</a>
+        <span class="mx-2">/</span>
+        <span class="text-black font-medium">About</span>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Story Section -->
+        <div class="flex flex-col lg:flex-row items-center gap-16 mb-24">
+            <div class="w-full lg:w-1/2">
+                <h1 class="text-4xl font-bold tracking-tight mb-6">Our Story</h1>
+                <p class="text-gray-600 text-[15px] leading-relaxed mb-4">
+                    Launched in 2025, Listables is Egypt's premier online shopping destination with a mission to connect buyers and sellers across the country in a fast, secure, and reliable marketplace.
+                </p>
+                <p class="text-gray-600 text-[15px] leading-relaxed">
+                    We offer a platform where independent sellers can list their products and reach thousands of buyers, while shoppers enjoy a curated, quality-controlled experience with every purchase.
+                </p>
+            </div>
+            <div class="w-full lg:w-1/2 bg-secondary rounded-xl overflow-hidden h-80 flex items-center justify-center">
+                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800&h=500" alt="Our team" class="w-full h-full object-cover">
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-24">
+            <div class="border border-gray-200 rounded-xl p-8 text-center hover:bg-primary hover:text-white hover:border-primary transition group">
+                <div class="text-3xl font-bold mb-2">10k+</div>
+                <div class="text-sm text-gray-500 group-hover:text-white transition">Sellers Active</div>
+            </div>
+            <div class="border border-gray-200 rounded-xl p-8 text-center hover:bg-primary hover:text-white hover:border-primary transition group">
+                <div class="text-3xl font-bold mb-2">33k+</div>
+                <div class="text-sm text-gray-500 group-hover:text-white transition">Monthly Product Sales</div>
+            </div>
+            <div class="border border-gray-200 rounded-xl p-8 text-center hover:bg-primary hover:text-white hover:border-primary transition group">
+                <div class="text-3xl font-bold mb-2">45.5k</div>
+                <div class="text-sm text-gray-500 group-hover:text-white transition">Customers Active</div>
+            </div>
+            <div class="border border-gray-200 rounded-xl p-8 text-center hover:bg-primary hover:text-white hover:border-primary transition group">
+                <div class="text-3xl font-bold mb-2">25k+</div>
+                <div class="text-sm text-gray-500 group-hover:text-white transition">Annual Gross Sales</div>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24 text-center">
+            <div class="flex flex-col items-center">
+                <div class="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center mb-6 border-8 border-gray-200">
+                    <div class="w-14 h-14 rounded-full bg-black flex items-center justify-center text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-lg font-bold mb-2 uppercase">Free and Fast Delivery</h3>
+                <p class="text-sm text-gray-600">Free delivery for all orders over EGP 1400</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center mb-6 border-8 border-gray-200">
+                    <div class="w-14 h-14 rounded-full bg-black flex items-center justify-center text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-lg font-bold mb-2 uppercase">24/7 Customer Service</h3>
+                <p class="text-sm text-gray-600">Friendly 24/7 customer support</p>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center mb-6 border-8 border-gray-200">
+                    <div class="w-14 h-14 rounded-full bg-black flex items-center justify-center text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <h3 class="text-lg font-bold mb-2 uppercase">Money Back Guarantee</h3>
+                <p class="text-sm text-gray-600">We return money within 30 days</p>
+            </div>
+        </div>
+
+    </div>
+</main>
+{% endblock %}

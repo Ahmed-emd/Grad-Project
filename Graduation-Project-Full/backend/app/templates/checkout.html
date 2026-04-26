@@ -1,0 +1,129 @@
+{% extends "_layout.html" %}
+{% block content %}
+<main class="flex-grow w-full pb-20 pt-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 text-sm text-gray-500">
+    <a href="/index.html" class="hover:text-black">Home</a> <span class="mx-2">/</span> <span
+      class="text-black font-medium">Checkout</span>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 class="text-3xl font-bold tracking-tight mb-10">Billing Details</h1>
+
+    {% if multi_currency %}
+    <div class="mb-8 bg-yellow-50 border border-yellow-200 rounded px-4 py-3 text-sm">
+      Your cart has items with different currencies. Please checkout one currency at a time.
+    </div>
+    {% endif %}
+
+    {% if items|length == 0 %}
+    <div class="bg-secondary border border-gray-200 rounded px-6 py-10 text-center">
+      <p class="text-[15px]">Your cart is empty.</p>
+      <a href="/index.html"
+        class="inline-block mt-6 bg-primary text-white rounded px-8 py-3 text-sm font-medium hover:bg-red-600 transition">Continue
+        shopping</a>
+    </div>
+    {% else %}
+    <form method="post" action="/checkout/place-order">
+      <div class="flex flex-col lg:flex-row gap-16">
+        <div class="w-full lg:w-1/2 space-y-6">
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">First Name<span class="text-primary">*</span></label>
+            <input name="first_name" type="text"
+              class="bg-secondary rounded w-full px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300"
+              required>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Company Name</label>
+            <input name="company" type="text"
+              class="bg-secondary rounded w-full px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Street Address<span class="text-primary">*</span></label>
+            <input name="address_line1" type="text"
+              class="bg-secondary rounded w-full px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300"
+              required>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Apartment, floor, etc. (optional)</label>
+            <input name="address_line2" type="text"
+              class="bg-secondary rounded w-full px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300">
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Town/City<span class="text-primary">*</span></label>
+            <input name="city" type="text"
+              class="bg-secondary rounded w-full px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300"
+              required>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Phone Number<span class="text-primary">*</span></label>
+            <input name="phone" type="tel"
+              class="bg-secondary rounded w-full px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300"
+              required>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-400 mb-2">Email Address<span class="text-primary">*</span></label>
+            <input name="email" type="email"
+              class="bg-secondary rounded w-full px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-gray-300"
+              required>
+          </div>
+        </div>
+
+        <div class="w-full lg:w-[450px] mt-10 lg:mt-0 lg:ml-auto">
+          <div class="space-y-6 mb-6">
+            {% for it in items %}
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-secondary flex items-center justify-center p-1">
+                  <img src="{{ it.product.image_url }}" alt="{{ it.product.name }}" class="max-h-full mix-blend-multiply">
+                </div>
+                <span class="text-[15px]">{{ it.product.name }}</span>
+              </div>
+              <span class="text-[15px]">{{ money_fmt(it.product.currency, it.line_total_minor) }}</span>
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="space-y-4 border-b border-gray-200 pb-4 mb-4">
+            <div class="flex justify-between text-[15px]">
+              <span>Subtotal:</span>
+              <span>{{ money_fmt(currency, subtotal_minor) }}</span>
+            </div>
+            <div class="h-px bg-gray-200 w-full"></div>
+            <div class="flex justify-between text-[15px]">
+              <span>Shipping:</span>
+              <span>{{ money_fmt(currency, shipping_minor) }}</span>
+            </div>
+            <div class="h-px bg-gray-200 w-full"></div>
+            <div class="flex justify-between text-[15px] font-medium">
+              <span>Total:</span>
+              <span>{{ money_fmt(currency, total_minor) }}</span>
+            </div>
+          </div>
+
+          <div class="space-y-4 mb-6">
+  <div class="flex items-center space-x-3 opacity-40 cursor-not-allowed select-none">
+    <input type="radio" name="payment_method" id="cod" value="cod" disabled
+      class="w-4 h-4 text-gray-300 bg-secondary border-gray-300">
+    <label for="cod" class="text-[15px] text-gray-400">
+      Cash on Delivery
+      <span class="ml-2 text-xs bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full">Not available</span>
+    </label>
+  </div>
+  <div class="flex items-center space-x-3">
+    <input type="radio" name="payment_method" id="visa" value="visa" checked
+      class="w-4 h-4 text-primary bg-secondary border-gray-300 focus:ring-primary">
+    <label for="visa" class="text-[15px]">Visa on Delivery</label>
+  </div>
+</div>
+
+          <button type="submit"
+            class="block w-full text-center bg-primary text-white py-4 rounded text-sm font-medium hover:bg-red-600 transition">
+            Place Order
+          </button>
+        </div>
+      </div>
+    </form>
+    {% endif %}
+  </div>
+</main>
+{% endblock %}
